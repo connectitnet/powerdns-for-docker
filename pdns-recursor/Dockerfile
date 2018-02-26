@@ -20,7 +20,7 @@ ENV VERSION=4.1 \
   PDNS_setgid=pdns \
   PDNS_daemon=no \
   PDNS_local_port=53 \
-  PDNS_local_address:=0.0.0.0 \
+  PDNS_local_address=0.0.0.0 \
   PDNS_allow-from=0.0.0.0/0
 
 EXPOSE 53 53/udp

@@ -1,5 +1,5 @@
 FROM python:stretch
-MAINTAINER "Jonathan Senecal" <JSenecal@connectitnet.com>
+LABEL maintainer="JSenecal@connectitnet.com"
 
 COPY src/* /
 

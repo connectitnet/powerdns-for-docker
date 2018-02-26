@@ -25,4 +25,4 @@ EXPOSE 53 53/udp
 COPY recursor.conf.jinja2 /etc/powerdns/
 COPY docker-cmd.sh /
 
-CMD [ "sh", "/docker-cmd.sh" ]
+CMD [ "bash", "/docker-cmd.sh" ]

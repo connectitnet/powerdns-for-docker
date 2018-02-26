@@ -16,9 +16,12 @@ RUN pip3 install envtpl \
 RUN mkdir -p /etc/pdns/api.d
 
 ENV VERSION=4.1 \
-  PDNS_setuid=recursor \
-  PDNS_setgid=recursor \
-  PDNS_daemon=no
+  PDNS_setuid=pdns \
+  PDNS_setgid=pdns \
+  PDNS_daemon=no \
+  PDNS_local_port=53 \
+  PDNS_local_address:=0.0.0.0 \
+  PDNS_allow-from=0.0.0.0/0
 
 EXPOSE 53 53/udp
 

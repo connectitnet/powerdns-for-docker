@@ -1,19 +1,19 @@
 FROM python:stretch
 LABEL maintainer="JSenecal@connectitnet.com"
 
-COPY src/* /
+RUN apt-get update && apt-get install -y \
+  curl \
+  gnupg
 
-RUN apt update \
-  && apt-get install -y curl gnupg \
-  && curl https://repo.powerdns.com/FD380FBB-pub.asc | apt-key add - \
-  && apt-get update \
-  && apt-get install -y pdns-recursor \
+COPY src/ /
+
+RUN curl https://repo.powerdns.com/FD380FBB-pub.asc | apt-key add - \
+  && apt-get update && apt-get install -y \
+  pdns-recursor \
   && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install envtpl \
   && rm -rf ~/.cache/*
-
-RUN mkdir -p /etc/pdns/api.d
 
 ENV VERSION=4.1 \
   PDNS_setuid=pdns \

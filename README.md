@@ -1,18 +1,17 @@
-# PowerDNS Docker Images
+# PowerDNS 4.1 Docker Images based on Debian 9 (Stretch)
 
 This repository contains four Docker images - pdns-sql, pdns-recursor, pdns-admin-static and pdns-admin-uwsgi.
-Image **pdns-sql** contains completely configurable [PowerDNS 4.1.x server](https://www.powerdns.com/) with sql, gpgsql and gsqlite3 backends (without any sql server).
+Image **pdns** contains completely configurable [PowerDNS 4.1.x server](https://www.powerdns.com/) with mysql, gpgsql and gsqlite3 backends.
 Image **pdns-recursor** contains completely configurable [PowerDNS 4.1.x recursor](https://www.powerdns.com/).
-Images **pdns-admin-static** and **pdns-admin-uwsgi** contains fronted (nginx) and backend (uWSGI) for [PowerDNS Admin](https://github.com/thomasDOTde/PowerDNS-Admin) web app, written in Flask, for managing PowerDNS servers. Pdns-admin is also completely configurable.
+Images **pdns-admin-static** and **pdns-admin-uwsgi** contains fronted (nginx) and backend (uWSGI) for [PowerDNS Admin](https://github.com/thomasDOTde/PowerDNS-Admin) web app, written in Flask, for managing PowerDNS servers. [PowerDNS Admin](https://github.com/thomasDOTde/PowerDNS-Admin) is also completely configurable.
 
-## pdns-sql
+## pdns
 
-Docker image with [PowerDNS 4.1.x server](https://www.powerdns.com/) and sql backends (without any sql server). For running, it needs external sql server.
+Docker image with [PowerDNS 4.1.x server](https://www.powerdns.com/) and backends for mysql, gpgsql and gsqlite3.
 
 Env vars for gmysql configuration:
 
 ```text
-
 (name=default value)
 
 PDNS_gmysql_host=
@@ -21,13 +20,9 @@ PDNS_gmysql_port=3306
 PDNS_gmysql_user=root
 PDNS_gmysql_password=powerdns
 PDNS_gmysql_dbname=powerdns
-
 ```
 
-If linked with official [mariadb](https://hub.docker.com/_/mariadb/) image with alias `
-sql`, the connection can be automatically configured, so you don't need to specify any of the above. Also, DB is automatically initialized if tables are missing.
-
-PowerDNS server is configurable via env vars. Every variable starting with `PDNS_` will be inserted into `/etc/pdns/pdns.conf` conf file in the following way: prefix `PDNS_` will be stripped and every `_` will be replaced with `-`. For example, from above sql config, `PDNS_gmysql_host=sql` will become `gsql-host=sql` in `/etc/pdns/pdns.conf` file. This way, you can configure PowerDNS server any way you need within a `docker run` command.
+PowerDNS server is configurable via env vars. Every variable starting with `PDNS_` will be inserted into `/etc/pdns/pdns.conf` configuration file in the following way: prefix `PDNS_` will be stripped and every `_` will be replaced with `-`. For example, from above sql config, `PDNS_gmysql_host=sql` will become `gsql-host=sql` in `/etc/pdns/pdns.conf` file. This way, you can configure PowerDNS server any way you need within a `docker run` command.
 
 There is also a `SUPERMASTER_IPS` env var supported, which can be used to configure supermasters for slave dns server. [Docs](https://doc.powerdns.com/md/authoritative/modes-of-operation/#supermaster-automatic-provisioning-of-slaves). Multiple ip addresses separated by space should work.
 
@@ -54,7 +49,7 @@ docker run -d -p 53:53 -p 53:53/udp --name pdns-master \
   -e PDNS_default_soa_mail=hostmaster.example.com \
   -e PDNS_allow_axfr_ips=172.5.0.21 \
   -e PDNS_only_notify=172.5.0.21 \
-  connectitnet/pdns-sql
+  connectitnet/pdns
 ```
 
 #### Slave server with supermaster
@@ -69,15 +64,14 @@ docker run -d -p 53:53 -p 53:53/udp --name pdns-slave \
   -e PDNS_disable_axfr=yes \
   -e PDNS_allow_notify_from=172.5.0.20 \
   -e SUPERMASTER_IPS=172.5.0.20 \
-  connectitnet/pdns-
-  sql
+  connectitnet/pdns
 ```
 
 ## pdns-recursor
 
 Docker image with [PowerDNS 4.1.x recursor](https://www.powerdns.com/).
 
-PowerDNS recursor is configurable via env vars. Every variable starting with `PDNS_` will be inserted into `/etc/pdns/recursor.conf` conf file in the following way: prefix `PDNS_` will be stripped and every `_` will be replaced with `-`. For example, from above sql config, `PDNS_gmysql_host=sql` will become `gsql-host=sql` in `/etc/pdns/recursor.conf` file. This way, you can configure PowerDNS recursor any way you need within a `docker run` command.
+PowerDNS recursor is configurable via env vars. Every variable starting with `PDNS_` will be inserted into `/etc/pdns/recursor.conf` configuration file in the following way: prefix `PDNS_` will be stripped and every `_` will be replaced with `-`. For example, from above sql config, `PDNS_gmysql_host=sql` will become `gsql-host=sql` in `/etc/pdns/recursor.conf` file. This way, you can configure PowerDNS recursor any way you need within a `docker run` command.
 
 You can find [here](https://doc.powerdns.com/md/recursor/settings/) all available settings.
 
@@ -86,9 +80,7 @@ You can find [here](https://doc.powerdns.com/md/recursor/settings/) all availabl
 Recursor server with API enabled:
 
 ```shell
-
 docker run -d -p 53:53 -p 53:53/udp --name pdns-recursor connectitnet/pdns-recursor
-
 ```
 
 ## pdns-admin-uwsgi

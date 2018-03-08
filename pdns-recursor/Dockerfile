@@ -1,14 +1,14 @@
 FROM python:stretch
 LABEL maintainer="JSenecal@connectitnet.com"
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
   curl \
   gnupg
 
 COPY src/ /
 
 RUN curl https://repo.powerdns.com/FD380FBB-pub.asc | apt-key add - \
-  && apt-get update && apt-get install -y \
+  && apt-get update && apt-get install -y --no-install-recommends \
   pdns-recursor \
   && rm -rf /var/lib/apt/lists/*
 

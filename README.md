@@ -1,6 +1,6 @@
 # PowerDNS 4.1 Docker Images based on Debian 9 (Stretch)
 
-This repository contains four Docker images - pdns-sql, pdns-recursor, pdns-admin-static and pdns-admin-uwsgi.
+This repository contains four Docker images - pdns, pdns-recursor, pdns-admin-static and pdns-admin-uwsgi.
 Image **pdns** contains completely configurable [PowerDNS 4.1.x server](https://www.powerdns.com/) with mysql, gpgsql and gsqlite3 backends.
 Image **pdns-recursor** contains completely configurable [PowerDNS 4.1.x recursor](https://www.powerdns.com/).
 Images **pdns-admin-static** and **pdns-admin-uwsgi** contains fronted (nginx) and backend (uWSGI) for [PowerDNS Admin](https://github.com/thomasDOTde/PowerDNS-Admin) web app, written in Flask, for managing PowerDNS servers. [PowerDNS Admin](https://github.com/thomasDOTde/PowerDNS-Admin) is also completely configurable.
@@ -28,7 +28,7 @@ There is also a `SUPERMASTER_IPS` env var supported, which can be used to config
 
 You can find [here](https://doc.powerdns.com/md/authoritative/) all available settings.
 
-### pdns-sql Examples
+### pdns Examples
 
 #### Master server with API enabled and with one slave server configured
 

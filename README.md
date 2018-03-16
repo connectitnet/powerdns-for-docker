@@ -3,7 +3,7 @@
 This repository contains four Docker images - pdns, pdns-recursor, pdns-admin-static and pdns-admin-uwsgi.
 Image **pdns** contains completely configurable [PowerDNS 4.1.x server](https://www.powerdns.com/) with mysql, gpgsql and gsqlite3 backends.
 Image **pdns-recursor** contains completely configurable [PowerDNS 4.1.x recursor](https://www.powerdns.com/).
-Images **pdns-admin-static** and **pdns-admin-uwsgi** contains fronted (nginx) and backend (uWSGI) for [PowerDNS Admin](https://github.com/thomasDOTde/PowerDNS-Admin) web app, written in Flask, for managing PowerDNS servers. [PowerDNS Admin](https://github.com/thomasDOTde/PowerDNS-Admin) is also completely configurable.
+Images **pdns-admin-static** and **pdns-admin-uwsgi** contains frontend (nginx) and backend (uWSGI) for [PowerDNS Admin](https://github.com/thomasDOTde/PowerDNS-Admin) web app, written in Flask, for managing PowerDNS servers. [PowerDNS Admin](https://github.com/thomasDOTde/PowerDNS-Admin) is also completely configurable.
 
 ## pdns
 

@@ -14,8 +14,7 @@ Env vars for gmysql configuration:
 ```text
 (name=default value)
 
-PDNS_gmysql_host=
-sql
+PDNS_gmysql_host=sql
 PDNS_gmysql_port=3306
 PDNS_gmysql_user=root
 PDNS_gmysql_password=powerdns

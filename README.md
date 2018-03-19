@@ -12,20 +12,20 @@ Docker image with [PowerDNS 4.1.x server](https://www.powerdns.com/) and backend
 Env vars for gmysql configuration:
 
 ```text
-(name=default value)
-
-PDNS_gmysql_host=sql
+backend=gmysql
+PDNS_gmysql_host=mysql
 PDNS_gmysql_port=3306
 PDNS_gmysql_user=root
 PDNS_gmysql_password=powerdns
 PDNS_gmysql_dbname=powerdns
+PDNS_launch=gmysql
 ```
 
-PowerDNS server is configurable via env vars. Every variable starting with `PDNS_` will be inserted into `/etc/pdns/pdns.conf` configuration file in the following way: prefix `PDNS_` will be stripped and every `_` will be replaced with `-`. For example, from above sql config, `PDNS_gmysql_host=sql` will become `gsql-host=sql` in `/etc/pdns/pdns.conf` file. This way, you can configure PowerDNS server any way you need within a `docker run` command.
+PowerDNS server is configurable via env vars. Every variable starting with `PDNS_` will be inserted into `/etc/pdns/pdns.conf` configuration file in the following way: prefix `PDNS_` will be stripped and every `_` will be replaced with `-`. For example, from above sql config, `PDNS_gmysql_host=mysql` will become `gmysql-host=sql` in `/etc/pdns/pdns.conf` file. This way, you can configure the PowerDNS server any way you need within a `docker run` command.
 
 There is also a `SUPERMASTER_IPS` env var supported, which can be used to configure supermasters for slave dns server. [Docs](https://doc.powerdns.com/md/authoritative/modes-of-operation/#supermaster-automatic-provisioning-of-slaves). Multiple ip addresses separated by space should work.
 
-You can find [here](https://doc.powerdns.com/md/authoritative/) all available settings.
+All available settings can be found over [here](https://doc.powerdns.com/md/authoritative/).
 
 ### pdns Examples
 
@@ -70,9 +70,9 @@ docker run -d -p 53:53 -p 53:53/udp --name pdns-slave \
 
 Docker image with [PowerDNS 4.1.x recursor](https://www.powerdns.com/).
 
-PowerDNS recursor is configurable via env vars. Every variable starting with `PDNS_` will be inserted into `/etc/pdns/recursor.conf` configuration file in the following way: prefix `PDNS_` will be stripped and every `_` will be replaced with `-`. For example, from above sql config, `PDNS_gmysql_host=sql` will become `gsql-host=sql` in `/etc/pdns/recursor.conf` file. This way, you can configure PowerDNS recursor any way you need within a `docker run` command.
+PowerDNS recursor is configurable via env vars. Every variable starting with `PDNS_` will be inserted into `/etc/pdns/recursor.conf` configuration file in the following way: prefix `PDNS_` will be stripped and every `_` will be replaced with `-` just like above. This way, you can configure the PowerDNS recursor any way you need within a `docker run` command.
 
-You can find [here](https://doc.powerdns.com/md/recursor/settings/) all available settings.
+All available settings can be found over [here](https://doc.powerdns.com/md/recursor/settings/).
 
 ### pdns-recursor Examples
 
@@ -98,7 +98,7 @@ PDNS_ADMIN_SQLA_DB_PASSWORD="'powerdnsadmin'"
 PDNS_ADMIN_SQLA_DB_NAME="'powerdnsadmin'"
 ```
 
-If linked with official [mariadb](https://hub.docker.com/_/mariadb/) image with alias `sql`, the connection can be automatically configured, so you don't need to specify any of the above. Also, DB is automatically initialized if tables are missing.
+If linked with official [mariadb](https://hub.docker.com/_/mariadb/) image with alias `mysql`, the connection can be automatically configured, so you don't need to specify any of the above. Also, DB is automatically initialized if tables are missing.
 
 Similar to the pdns-
 sql, pdns-admin is also completely configurable via env vars. Prefix in this case is `PDNS_ADMIN_`, but there is one caveat: as the config file is a python source file, every string value must be quoted, as shown above. Double quotes are consumed by Bash, so the single quotes stay for Python. (Port number in this case is treated as string, because later on it's concatenated with hostname, user, etc in the db uri). Configuration from these env vars will be written to the `/opt/powerdns-admin/config.py` file.

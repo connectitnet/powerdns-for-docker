@@ -10,6 +10,7 @@ COPY src/ /
 RUN curl https://repo.powerdns.com/FD380FBB-pub.asc | apt-key add - \
   && apt-get update && apt-get install -y --no-install-recommends \
   pdns-recursor \
+  && apt-get purge -y --auto-remove curl gnupg \
   && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install envtpl \

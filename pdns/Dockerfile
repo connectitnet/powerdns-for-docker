@@ -9,12 +9,15 @@ COPY src/ /
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN curl https://repo.powerdns.com/FD380FBB-pub.asc | apt-key add - \
+  && curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
   && apt-get update && apt-get install -y --no-install-recommends \
   pdns-server \
   pdns-backend-mysql \
   pdns-backend-pgsql \
   pdns-backend-sqlite3 \
   pdns-tools \
+  postgresql-client \
+  && apt-get purge -y --auto-remove curl gnupg \
   && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install envtpl \

@@ -17,6 +17,7 @@ RUN curl https://repo.powerdns.com/FD380FBB-pub.asc | apt-key add - \
   pdns-backend-sqlite3 \
   pdns-tools \
   postgresql-client \
+  mysql-client \
   && apt-get purge -y --auto-remove curl gnupg \
   && rm -rf /var/lib/apt/lists/*
 

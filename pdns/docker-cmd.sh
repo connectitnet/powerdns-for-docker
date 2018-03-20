@@ -30,7 +30,7 @@ case ${BACKEND} in
     MYSQL_CHECK_IF_HAS_TABLE="SELECT COUNT(DISTINCT table_name) FROM information_schema.columns WHERE table_schema = '${PDNS_gmysql_dbname}';"
     MYSQL_NUM_TABLE=$($MYSQL_COMMAND --batch --skip-column-names -e "$MYSQL_CHECK_IF_HAS_TABLE")
     if [ "$MYSQL_NUM_TABLE" -eq 0 ]; then
-        echo "Database $PDNS_gpgsql_dbname is empty, importing mysql default schema..."
+        echo "Database $PDNS_gmysql_dbname is empty, importing mysql default schema..."
         $MYSQL_COMMAND -D "$PDNS_gmysql_dbname" < /usr/share/doc/pdns-backend-mysql/schema.mysql.sql
     fi
 

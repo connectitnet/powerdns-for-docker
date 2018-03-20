@@ -35,8 +35,7 @@ All available settings can be found over [here](https://doc.powerdns.com/md/auth
 
 ```shell
 docker run -d -p 53:53 -p 53:53/udp --name pdns-master \
-  --hostname ns1.example.com --link mariadb:
-  sql \
+  --hostname ns1.example.com --link mariadb:mysql \
   -e PDNS_master=yes \
   -e PDNS_api=yes \
   -e PDNS_api_key=secret \
@@ -57,8 +56,7 @@ docker run -d -p 53:53 -p 53:53/udp --name pdns-master \
 
 ```shell
 docker run -d -p 53:53 -p 53:53/udp --name pdns-slave \
-  --hostname ns2.example.com --link mariadb:
-  sql \
+  --hostname ns2.example.com --link mariadb:mysql \
   -e PDNS_gmysql_dbname=powerdnsslave \
   -e PDNS_slave=yes \
   -e PDNS_version_string=anonymous \

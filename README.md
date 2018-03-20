@@ -27,7 +27,7 @@ Every variable starting with `PDNS_` will also be inserted into `/etc/pdns/pdns.
 
 There is also a `SUPERMASTER_IPS` env var supported, which can be used to configure supermasters for slave dns server. [Docs](https://doc.powerdns.com/md/authoritative/modes-of-operation/#supermaster-automatic-provisioning-of-slaves). Multiple ip addresses separated by space should work.
 
-All available settings can be found over [here](https://doc.powerdns.com/md/authoritative/).
+All available settings can be found over [here](https://doc.powerdns.com/md/authoritative/settings/).
 
 ### pdns Examples
 

@@ -49,7 +49,7 @@ case ${BACKEND} in
     : "${PDNS_gpgsql_host:=postgres}"
     : "${PDNS_gpgsql_port:=5432}"
     : "${PDNS_gpgsql_user:=${POSTGRES_ENV_POSTGRES_USER:-postgres}}"
-    : "${PDNS_gpgsql_password:=${POSTGRES_ENV_POSTGRES_PASSWORD:-powerdns}}"
+    : "${PDNS_gpgsql_password:='${POSTGRES_ENV_POSTGRES_PASSWORD:-powerdns}'}"
     : "${PGPASSWORD:=${PDNS_gpgsql_password}}"
     : "${PDNS_gpgsql_dbname:=${POSTGRES_ENV_POSTGRES_DB:-${PDNS_gpgsql_user}}}"
     PDNS_launch=gpgsql

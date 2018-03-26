@@ -1,10 +1,9 @@
 # PowerDNS 4.1 Docker Images based on Debian 9 (Stretch)
 
-This repository contains four Docker images - pdns, pdns-recursor, pdns-admin-static and pdns-admin-uwsgi.
+This repository contains four Docker images - pdns, pdns-recursor, pdns-admin-nginx and pdns-admin-uwsgi.
 Image **pdns** contains completely configurable [PowerDNS 4.1.x server](https://www.powerdns.com/) with mysql, gpgsql and gsqlite3 backends.
 Image **pdns-recursor** contains completely configurable [PowerDNS 4.1.x recursor](https://www.powerdns.com/).
-***
-**Eventually**, images **pdns-admin-static** and **pdns-admin-uwsgi** will contain frontend (nginx) and backend (uWSGI) for [PowerDNS Admin](https://github.com/thomasDOTde/PowerDNS-Admin) web app, written in Flask, for managing PowerDNS servers. [PowerDNS Admin](https://github.com/thomasDOTde/PowerDNS-Admin) is also completely configurable.
+Images **pdns-admin-nginx** and **pdns-admin-uwsgi** will contain frontend (nginx) and backend (uWSGI) for [PowerDNS Admin](https://github.com/thomasDOTde/PowerDNS-Admin) web app, written in Flask, for managing PowerDNS servers. [PowerDNS Admin](https://github.com/thomasDOTde/PowerDNS-Admin) is also completely configurable.
 ***
 
 ## pdns
@@ -139,8 +138,7 @@ sql from this repo and with LDAP auth:
 
 ```text
 docker run -d --name pdns-admin-uwsgi \
-  --link mariadb:
-  sql --link pdns-master:pdns \
+  --link mariadb:mysql --link pdns-master:pdns \
   -v pdns-admin-upload:/opt/powerdns-admin/upload \
   -e PDNS_ADMIN_LDAP_TYPE="'ldap'" \
   -e PDNS_ADMIN_LDAP_URI="'ldaps://your-ldap-server:636'" \
@@ -152,14 +150,14 @@ docker run -d --name pdns-admin-uwsgi \
   connectitnet/pdns-admin-uwsgi
 ```
 
-## pdns-admin-static
+## pdns-admin-nginx
 
-Fronted image with nginx and static files for [PowerDNS Admin](https://github.com/thomasDOTde/PowerDNS-Admin). Exposes port 80 for connections, expects uWSGI backend image under `pdns-admin-uwsgi` alias.
+Front-end image with nginx and static files for [PowerDNS Admin](https://github.com/thomasDOTde/PowerDNS-Admin). Exposes port 8080 for proxy connections, and expects a uWSGI backend image under `pdns-admin-uwsgi` alias.
 
-### pdns-admin-static Example
+### pdns-admin-nginx Example
 
 ```shell
-docker run -d -p 8080:80 --name pdns-admin-static \
+docker run -d --name pdns-admin-nginx \
   --link pdns-admin-uwsgi:pdns-admin-uwsgi \
-  connectitnet/pdns-admin-static
+  connectitnet/pdns-admin-nginx
 ```

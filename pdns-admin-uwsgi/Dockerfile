@@ -1,9 +1,15 @@
-FROM alpine
+FROM python:2-stretch
 LABEL maintainer="Jonathan Senecal <JSenecal@jonathansenecal.com>"
 
 RUN apk add --no-cache \
     curl \
     py-pip \
+    libxslt \ 
+    libxslt-dev \
+    libxml2 \
+    libxml2-dev \
+    xmlsec \
+    xmlsec-dev \
     uwsgi-python \
     py-mysqldb \
     py-psycopg2 \
@@ -11,7 +17,8 @@ RUN apk add --no-cache \
     py-cffi \
     py-bcrypt \
     mariadb-client \
-    postgresql-client
+    postgresql-client \
+    gcc
 
 RUN mkdir -p /opt/powerdns-admin \
   && curl -sSL https://github.com/thomasDOTde/PowerDNS-Admin/archive/master.tar.gz \

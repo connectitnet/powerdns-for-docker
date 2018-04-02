@@ -1,32 +1,27 @@
 FROM python:2-stretch
 LABEL maintainer="Jonathan Senecal <JSenecal@jonathansenecal.com>"
 
-RUN apk add --no-cache \
-    curl \
-    py-pip \
-    libxslt \ 
-    libxslt-dev \
-    libxml2 \
-    libxml2-dev \
-    xmlsec \
-    xmlsec-dev \
-    uwsgi-python \
-    py-mysqldb \
-    py-psycopg2 \
-    py-pyldap \
-    py-cffi \
-    py-bcrypt \
-    mariadb-client \
-    postgresql-client \
-    gcc
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  curl \
+  gnupg
 
-RUN mkdir -p /opt/powerdns-admin \
-  && curl -sSL https://github.com/thomasDOTde/PowerDNS-Admin/archive/master.tar.gz \
-    | tar -xzC /opt/powerdns-admin --strip 1 \
+COPY src/ /
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
+  && apt-get update && apt-get install -y --no-install-recommends \
+  postgresql-client \
+  mysql-client \
+  libxmlsec1-dev \
+  uwsgi \
+  python-ldap \
+  && rm -rf /var/lib/apt/lists/* \
+  && mkdir -p /opt/powerdns-admin \
+  && curl -sSL https://github.com/thomasDOTde/PowerDNS-Admin/archive/master.tar.gz | tar -xzC /opt/powerdns-admin --strip 1 \
   && sed -i '/python-ldap/d' /opt/powerdns-admin/requirements.txt \
-  && sed -i '/bcrypt/d' /opt/powerdns-admin/requirements.txt \
   && chown -R root: /opt/powerdns-admin \
-  && chown -R uwsgi: /opt/powerdns-admin/upload
+  && chown -R www-data: /opt/powerdns-admin/upload \
+  && apt-get purge -y --auto-remove curl gnupg
 
 WORKDIR /opt/powerdns-admin
 
@@ -46,10 +41,10 @@ EXPOSE 8181
 VOLUME [ "/opt/powerdns-admin/upload" ]
 
 COPY pdns-admin.ini /etc/uwsgi/conf.d/
-RUN chown uwsgi: /etc/uwsgi/conf.d/pdns-admin.ini \
+RUN chown www-data: /etc/uwsgi/conf.d/pdns-admin.ini \
   && ln -s /etc/uwsgi/uwsgi.ini /etc/uwsgi.ini
 
-COPY config.py.tpl /
+COPY config.py.jinja2 /
 COPY docker-cmd.sh /
 
 CMD [ "/docker-cmd.sh" ]

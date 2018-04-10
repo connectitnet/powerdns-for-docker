@@ -47,4 +47,4 @@ RUN chown www-data: /etc/uwsgi/conf.d/pdns-admin.ini \
 COPY config.py.jinja2 /
 COPY docker-cmd.sh /
 
-CMD [ "/docker-cmd.sh" ]
+CMD [ "bash", "/docker-cmd.sh" ]

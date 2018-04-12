@@ -27,9 +27,13 @@ RUN pip3 install envtpl \
 ENV VERSION=4.1 \
   PDNS_setuid=pdns \
   PDNS_setgid=pdns \
-  PDNS_guardian=yes
+  PDNS_guardian=yes \
+  PDNS_webserver=yes \
+  PDNS_webserver_address=0.0.0.0 \
+  PDNS_api_readonly=yes
+  
 
-EXPOSE 53 53/udp
+EXPOSE 53 53/udp 8001
 
 COPY pdns.conf.jinja2 /etc/powerdns/
 COPY docker-cmd.sh /

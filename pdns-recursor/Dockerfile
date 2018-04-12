@@ -22,9 +22,12 @@ ENV VERSION=4.1 \
   PDNS_daemon=no \
   PDNS_local_port=53 \
   PDNS_local_address=0.0.0.0 \
-  PDNS_allow-from=0.0.0.0/0
+  PDNS_allow-from=0.0.0.0/0 \
+  PDNS_webserver=yes \
+  PDNS_webserver_address=0.0.0.0 \
+  PDNS_api_readonly=yes
 
-EXPOSE 53 53/udp
+EXPOSE 53 53/udp 8082
 
 COPY recursor.conf.jinja2 /etc/powerdns/
 COPY docker-cmd.sh /

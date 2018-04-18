@@ -108,6 +108,6 @@ esac
 # python2 /opt/powerdns-admin/db_upgrade.py
 
 mkdir -p /run/uwsgi
-chown uwsgi: /run/uwsgi
+chown www-data: /run/uwsgi
 
 exec /usr/sbin/uwsgi --ini /etc/uwsgi.ini

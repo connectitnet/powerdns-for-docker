@@ -33,7 +33,7 @@ ENV VERSION=4.1 \
   PDNS_api_readonly=yes
   
 
-EXPOSE 53 53/udp 8001
+EXPOSE 53 53/udp 8081
 
 COPY pdns.conf.jinja2 /etc/powerdns/
 COPY docker-cmd.sh /

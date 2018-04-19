@@ -30,6 +30,7 @@ ENV VERSION=4.1 \
   PDNS_guardian=yes \
   PDNS_webserver=yes \
   PDNS_webserver_address=0.0.0.0 \
+  PDNS_webserver_port=8081 \
   PDNS_api_readonly=yes
   
 

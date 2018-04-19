@@ -32,8 +32,9 @@ EXPOSE 8181
 
 VOLUME [ "/opt/powerdns-admin/upload" ]
 
-RUN pip install envtpl uwsgi ldap \
+RUN pip install envtpl uwsgi ldap psycopg2 \
   && ln -s /usr/lib/python2.7/plat-x86_64-linux-gnu/_sysconfigdata_nd.py /usr/lib/python2.7/
+
 COPY uwsgi.ini /etc/uwsgi/
 COPY supervisord.conf /etc/supervisord.conf
 COPY config.py.jinja2 /

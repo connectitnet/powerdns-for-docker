@@ -1,10 +1,14 @@
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-{% for key, value in environment('PDNS_ADMIN_') %}{{ key }} = {{ value }}
+{% for key, value in environment('PDNS_ADMIN_') %}{{ key }} = "{{ value }}"
 {% endfor %}
 
 WTF_CSRF_ENABLED = True
+
+# SAML Authentication
+SAML_ENABLED = os.getenv('PDNS_ADMIN_SAML_ENABLED',False)
+
 BIND_ADDRESS = '0.0.0.0'
 PORT = 8181
 LOG_FILE = ''

@@ -1,33 +1,24 @@
 FROM python:2-stretch
 LABEL maintainer="Jonathan Senecal <JSenecal@jonathansenecal.com>"
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-  curl \
-  gnupg
-
 COPY src/ /
 
 ENV DEBIAN_FRONTEND=noninteractive
-RUN curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  curl \
+  gnupg \
+  && curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
   && apt-get update && apt-get install -y --no-install-recommends \
   postgresql-client \
   mysql-client \
   libxmlsec1-dev \
-  uwsgi \
+  supervisor \
   python-ldap \
   && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /opt/powerdns-admin \
-  && curl -sSL https://github.com/thomasDOTde/PowerDNS-Admin/archive/master.tar.gz | tar -xzC /opt/powerdns-admin --strip 1 \
-  && sed -i '/python-ldap/d' /opt/powerdns-admin/requirements.txt \
-  && chown -R root: /opt/powerdns-admin \
-  && chown -R www-data: /opt/powerdns-admin/upload \
-  && apt-get purge -y --auto-remove curl gnupg
+  && apt-get purge -y --auto-remove gnupg
 
 WORKDIR /opt/powerdns-admin
-
-RUN pip install envtpl \
-  && pip install -r requirements.txt \
-  && rm -rf ~/.cache/*
 
 ENV PDNS_ADMIN_LOGIN_TITLE="'PDNS'" \
   PDNS_ADMIN_TIMEOUT=10 \
@@ -40,10 +31,10 @@ EXPOSE 8181
 
 VOLUME [ "/opt/powerdns-admin/upload" ]
 
-COPY pdns-admin.ini /etc/uwsgi/conf.d/
-RUN chown www-data: /etc/uwsgi/conf.d/pdns-admin.ini \
-  && ln -s /etc/uwsgi/uwsgi.ini /etc/uwsgi.ini
-
+RUN pip install envtpl uwsgi ldap \
+  && ln -s /usr/lib/python2.7/plat-x86_64-linux-gnu/_sysconfigdata_nd.py /usr/lib/python2.7/
+COPY uwsgi.ini /etc/uwsgi/
+COPY supervisord.conf /etc/supervisord.conf
 COPY config.py.jinja2 /
 COPY docker-cmd.sh /
 

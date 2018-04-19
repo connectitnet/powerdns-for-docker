@@ -1,6 +1,15 @@
-#!/bin/sh
+#!/bin/bash
 
 set -euo pipefail
+
+# Download code
+curl -sSL https://github.com/thomasDOTde/PowerDNS-Admin/archive/master.tar.gz | tar -xzC /opt/powerdns-admin --strip 1
+
+# Install python stuff
+sed -i '/python-ldap/d' /opt/powerdns-admin/requirements.txt
+chown -R root: /opt/powerdns-admin
+chown -R www-data: /opt/powerdns-admin/upload
+pip install -r requirements.txt
 
 # Generate secret key
 [ -f /root/secret-key ] || tr -dc _A-Z-a-z-0-9 < /dev/urandom | head -c 32 > /root/secret-key || true
@@ -8,30 +17,28 @@ PDNS_ADMIN_SECRET_KEY="'$(cat /root/secret-key)'"
 
 export PDNS_ADMIN_SECRET_KEY
 
-: "${SQLA_DB_BACKEND:='mysql'}"
+# Configure pdns server env vars
+: "${PDNS_ADMIN_PDNS_STATS_URL:=http://pdns:${PDNS_ENV_PDNS_webserver_port:-8081}/}"
+: "${PDNS_ADMIN_PDNS_API_KEY:=${PDNS_ENV_PDNS_api_key:-}}"
+: "${PDNS_ADMIN_PDNS_VERSION:=${PDNS_ENV_VERSION:-}}"
 
-case ${SQLA_DB_BACKEND} in
+export PDNS_ADMIN_PDNS_STATS_URL PDNS_ADMIN_PDNS_API_KEY PDNS_ADMIN_PDNS_VERSION
+
+
+case ${DBBACKEND} in
 'mysql')
     # Configure mysql env vars
-    : "${PDNS_ADMIN_SQLA_DB_HOST:='mysql'}"
-    : "${PDNS_ADMIN_SQLA_DB_PORT:='3306'}"
-    : "${PDNS_ADMIN_SQLA_DB_USER:='${MYSQL_ENV_MYSQL_USER:-root}'}"
+    : "${PDNS_ADMIN_SQLA_DB_BACKEND:=mysql}"
+    : "${PDNS_ADMIN_SQLA_DB_HOST:=mysql}"
+    : "${PDNS_ADMIN_SQLA_DB_PORT:=3306}"
+    : "${PDNS_ADMIN_SQLA_DB_USER:=${MYSQL_ENV_MYSQL_USER:-root}}"
     if [ "${PDNS_ADMIN_SQLA_DB_USER}" = "'root'" ]; then
-        : "${PDNS_ADMIN_SQLA_DB_PASSWORD:='$MYSQL_ENV_MYSQL_ROOT_PASSWORD'}"
+        : "${PDNS_ADMIN_SQLA_DB_PASSWORD:=$MYSQL_ENV_MYSQL_ROOT_PASSWORD}"
     fi
-    : "${PDNS_ADMIN_SQLA_DB_PASSWORD:='${MYSQL_ENV_MYSQL_PASSWORD:-powerdnsadmin}'}"
-    : "${PDNS_ADMIN_SQLA_DB_NAME:='${MYSQL_ENV_MYSQL_DATABASE:-powerdnsadmin}'}"
+    : "${PDNS_ADMIN_SQLA_DB_PASSWORD:=${MYSQL_ENV_MYSQL_PASSWORD:-powerdnsadmin}}"
+    : "${PDNS_ADMIN_SQLA_DB_NAME:=${MYSQL_ENV_MYSQL_DATABASE:-powerdnsadmin}}"
 
-    export PDNS_ADMIN_SQLA_DB_HOST PDNS_ADMIN_SQLA_DB_PORT PDNS_ADMIN_SQLA_DB_USER PDNS_ADMIN_SQLA_DB_PASSWORD PDNS_ADMIN_SQLA_DB_NAME
-
-    # Configure pdns server env vars
-    : "${PDNS_ADMIN_PDNS_STATS_URL:='http://pdns:${PDNS_ENV_PDNS_webserver_port:-8081}/'}"
-    : "${PDNS_ADMIN_PDNS_API_KEY:='${PDNS_ENV_PDNS_api_key:-}'}"
-    : "${PDNS_ADMIN_PDNS_VERSION:='${PDNS_ENV_VERSION:-}'}"
-
-    export PDNS_ADMIN_PDNS_STATS_URL PDNS_ADMIN_PDNS_API_KEY PDNS_ADMIN_PDNS_VERSION
-
-    
+    export PDNS_ADMIN_SQLA_DB_BACKEND PDNS_ADMIN_SQLA_DB_HOST PDNS_ADMIN_SQLA_DB_PORT PDNS_ADMIN_SQLA_DB_USER PDNS_ADMIN_SQLA_DB_PASSWORD PDNS_ADMIN_SQLA_DB_NAME    
 
     envtpl < /config.py.jinja2 > /opt/powerdns-admin/config.py
 
@@ -52,24 +59,18 @@ case ${SQLA_DB_BACKEND} in
     fi
     ;;
 'postgresql')
-# Configure postgresql env vars
+    # Configure postgresql env vars
+    : "${PDNS_ADMIN_SQLA_DB_BACKEND:=postgresql}"
     : "${PDNS_ADMIN_SQLA_DB_HOST:=postgres}"
     : "${PDNS_ADMIN_SQLA_DB_PORT:=5432}"
     : "${PDNS_ADMIN_SQLA_DB_USER:=${POSTGRES_ENV_POSTGRES_USER:-postgres}}"
-    : "${PDNS_ADMIN_SQLA_DB_PASSWORD:='${POSTGRES_ENV_POSTGRES_PASSWORD:-powerdns}'}"
+    : "${PDNS_ADMIN_SQLA_DB_PASSWORD:=${POSTGRES_ENV_POSTGRES_PASSWORD:-powerdns}}"
     : "${PGPASSWORD:=${PDNS_ADMIN_SQLA_DB_PASSWORD}}"
-    : "${PDNS_ADMIN_SQLA_DB_NAME:=${POSTGRES_ENV_POSTGRES_DB:-${PDNS_gpgsql_user}}}"
+    : "${PDNS_ADMIN_SQLA_DB_NAME:=${POSTGRES_ENV_POSTGRES_DB:-${PDNS_ADMIN_SQLA_DB_USER}}}"
 
-    export PDNS_ADMIN_SQLA_DB_HOST PDNS_ADMIN_SQLA_DB_PORT PDNS_ADMIN_SQLA_DB_USER PDNS_ADMIN_SQLA_DB_PASSWORD PDNS_ADMIN_SQLA_DB_NAME PGPASSWORD
+    export PDNS_ADMIN_SQLA_DB_BACKEND PDNS_ADMIN_SQLA_DB_HOST PDNS_ADMIN_SQLA_DB_PORT PDNS_ADMIN_SQLA_DB_USER PDNS_ADMIN_SQLA_DB_PASSWORD PDNS_ADMIN_SQLA_DB_NAME PGPASSWORD
 
-    # Configure pdns server env vars
-    : "${PDNS_ADMIN_PDNS_STATS_URL:='http://pdns:${PDNS_ENV_PDNS_webserver_port:-8081}/'}"
-    : "${PDNS_ADMIN_PDNS_API_KEY:='${PDNS_ENV_PDNS_api_key:-}'}"
-    : "${PDNS_ADMIN_PDNS_VERSION:='${PDNS_ENV_VERSION:-}'}"
-
-    export PDNS_ADMIN_PDNS_STATS_URL PDNS_ADMIN_PDNS_API_KEY PDNS_ADMIN_PDNS_VERSION
-
-    envtpl < /config.py.tpl > /opt/powerdns-admin/config.py
+    envtpl < /config.py.jinja2 > /opt/powerdns-admin/config.py
 
     # Initialize DB if needed
     PSQL_COMMAND="psql -h ${PDNS_ADMIN_SQLA_DB_HOST} -p ${PDNS_ADMIN_SQLA_DB_PORT} -U ${PDNS_ADMIN_SQLA_DB_USER} -w"
@@ -107,7 +108,4 @@ esac
 
 # python2 /opt/powerdns-admin/db_upgrade.py
 
-mkdir -p /run/uwsgi
-chown www-data: /run/uwsgi
-
-exec /usr/sbin/uwsgi --ini /etc/uwsgi.ini
+exec /usr/bin/supervisord

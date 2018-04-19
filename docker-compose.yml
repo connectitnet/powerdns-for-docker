@@ -1,6 +1,12 @@
 version: '3'
 services:
-  postgres:
+  pdnsdb:
+    image: postgres:10
+    environment:
+       - POSTGRES_PASSWORD=somepassword
+       - POSTGRES_USER=pdns
+    network_mode: bridge
+  pdnsadmindb:
     image: postgres:10
     environment:
        - POSTGRES_PASSWORD=somepassword
@@ -23,19 +29,19 @@ services:
       - PDNS_default_soa_mail=hostmaster.somedomain.com
     network_mode: bridge
     depends_on:
-      - postgres
+      - pdnsdb
     links:
-      - postgres:postgres
+      - pdnsdb:postgres
   pdns-admin-uwsgi:
     build: ./pdns-admin-uwsgi
     environment:
       - DBBACKEND=postgresql
     network_mode: bridge
     depends_on:
-      - postgres
+      - pdnsadmindb
       - pdns
     links:
-      - postgres:postgres
+      - pdnsadmindb:postgres
       - pdns:pdns
   pdns-admin-nginx:
     build: ./pdns-admin-nginx

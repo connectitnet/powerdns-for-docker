@@ -9,6 +9,6 @@ RUN mkdir -p /opt/powerdns-admin \
   && find /opt/powerdns-admin -path /opt/powerdns-admin/app/static -prune -o -type f -exec rm -f {} + \
   && chown -R root: /opt/powerdns-admin
 
-EXPOSE 8080
+EXPOSE 80
 
 COPY pdns-nginx.conf /etc/nginx/conf.d/default.conf

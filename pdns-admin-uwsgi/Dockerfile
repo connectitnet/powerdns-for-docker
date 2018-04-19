@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   mysql-client \
   libxmlsec1-dev \
   supervisor \
+  python-psycopg2 \
   python-ldap \
   && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /opt/powerdns-admin \

@@ -6,7 +6,6 @@ set -euo pipefail
 curl -sSL https://github.com/ngoduykhanh/PowerDNS-Admin/archive/master.tar.gz | tar -xzC /opt/powerdns-admin --strip 1
 
 # Install python stuff
-sed -i '/python-ldap/d' /opt/powerdns-admin/requirements.txt
 chown -R root: /opt/powerdns-admin
 chown -R www-data: /opt/powerdns-admin/upload
 pip install -r requirements.txt
@@ -55,7 +54,7 @@ case ${DBBACKEND} in
     MYSQL_CHECK_IF_HAS_TABLE="SELECT COUNT(DISTINCT table_name) FROM information_schema.columns WHERE table_schema = '${PDNS_ADMIN_SQLA_DB_NAME//\'/}';"
     MYSQL_NUM_TABLE=$($MYSQL_COMMAND --batch --skip-column-names -e "$MYSQL_CHECK_IF_HAS_TABLE")
     if [ "$MYSQL_NUM_TABLE" -eq 0 ]; then
-        python2 /opt/powerdns-admin/create_db.py
+        python3 /opt/powerdns-admin/create_db.py
     fi
     ;;
 'postgresql')
@@ -101,11 +100,11 @@ case ${DBBACKEND} in
 
     if [ "$NUM_TABLES_EXIST" -eq 0 ]; then
         echo "Database $PDNS_ADMIN_SQLA_DB_NAME is empty, creating db..."
-        python2 /opt/powerdns-admin/create_db.py
+        python3 /opt/powerdns-admin/create_db.py
     fi
     ;;
 esac
 
-# python2 /opt/powerdns-admin/db_upgrade.py
+python3 /opt/powerdns-admin/db_upgrade.py
 
 exec /usr/bin/supervisord -c /etc/supervisord.conf

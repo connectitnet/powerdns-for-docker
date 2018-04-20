@@ -7,14 +7,14 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
   curl \
   gnupg \
-  && curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
+  && curl https://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | apt-key add - \
   && apt-get update && apt-get install -y --no-install-recommends \
   postgresql-client \
   mysql-client \
-  libxmlsec1-dev \
-  supervisor \
-  python3-psycopg2 \
-  python3-ldap \
+  python3-pip python3-dev supervisor \
+  libmariadbclient-dev-compat \
+  libsasl2-dev libldap2-dev libssl-dev \
+  libxml2-dev libxslt1-dev libxmlsec1-dev libffi-dev pkg-config \
   && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /opt/powerdns-admin \
   && apt-get purge -y --auto-remove gnupg
@@ -32,8 +32,7 @@ EXPOSE 8181
 
 VOLUME [ "/opt/powerdns-admin/upload" ]
 
-RUN pip install envtpl uwsgi ldap psycopg2 \
-  && ln -s /usr/lib/python2.7/plat-x86_64-linux-gnu/_sysconfigdata_nd.py /usr/lib/python2.7/
+RUN pip install envtpl uwsgi ldap psycopg2
 
 COPY uwsgi.ini /etc/uwsgi/
 COPY supervisord.conf /etc/supervisord.conf

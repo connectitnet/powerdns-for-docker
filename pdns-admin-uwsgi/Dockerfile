@@ -21,9 +21,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /opt/powerdns-admin
 
-ENV PDNS_ADMIN_LOGIN_TITLE="'PDNS'" \
+ENV PDNS_ADMIN_LOGIN_TITLE="PDNS" \
   PDNS_ADMIN_TIMEOUT=10 \
-  PDNS_ADMIN_LOG_LEVEL="'INFO'" \
+  PDNS_ADMIN_LOG_LEVEL="INFO" \
   PDNS_ADMIN_BASIC_ENABLED=True \
   PDNS_ADMIN_SIGNUP_ENABLED=True \
   PDNS_ADMIN_RECORDS_ALLOW_EDIT="['SOA', 'NS', 'A', 'AAAA', 'CNAME', 'MX', 'TXT', 'SRV']"

@@ -12,7 +12,7 @@ pip install -r requirements.txt
 
 # Generate secret key
 [ -f /root/secret-key ] || tr -dc _A-Z-a-z-0-9 < /dev/urandom | head -c 32 > /root/secret-key || true
-PDNS_ADMIN_SECRET_KEY="'$(cat /root/secret-key)'"
+PDNS_ADMIN_SECRET_KEY=$(cat /root/secret-key)
 
 export PDNS_ADMIN_SECRET_KEY
 
@@ -105,6 +105,6 @@ case ${DBBACKEND} in
     ;;
 esac
 
-python3 /opt/powerdns-admin/db_upgrade.py
+# python3 /opt/powerdns-admin/db_upgrade.py
 
 exec /usr/bin/supervisord -c /etc/supervisord.conf

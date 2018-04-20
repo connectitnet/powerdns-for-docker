@@ -1,4 +1,4 @@
-FROM python:2-stretch
+FROM python:3-stretch
 LABEL maintainer="Jonathan Senecal <JSenecal@jonathansenecal.com>"
 
 COPY src/ /
@@ -13,8 +13,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   mysql-client \
   libxmlsec1-dev \
   supervisor \
-  python-psycopg2 \
-  python-ldap \
+  python3-psycopg2 \
+  python3-ldap \
   && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /opt/powerdns-admin \
   && apt-get purge -y --auto-remove gnupg

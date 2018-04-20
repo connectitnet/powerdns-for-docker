@@ -108,4 +108,4 @@ esac
 
 # python2 /opt/powerdns-admin/db_upgrade.py
 
-exec /usr/bin/supervisord
+exec /usr/bin/supervisord -c /etc/supervisord.conf

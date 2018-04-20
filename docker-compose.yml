@@ -21,7 +21,7 @@ services:
       - PDNS_api_key=someapikey
       - PDNS_api_readonly=no
       - PDNS_webserver_password=somewebpassword
-      - webserver-allow-from=0.0.0.0/0
+      - PDNS_webserver_allow_from=0.0.0.0/0
       - PDNS_version_string=anonymous
       - PDNS_default_ttl=3600
       - PDNS_soa_minimum_ttl=300

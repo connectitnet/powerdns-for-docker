@@ -156,7 +156,7 @@ docker run -d --name pdns-admin-uwsgi \
 
 ## pdns-admin-nginx
 
-Front-end image with nginx and static files for [PowerDNS Admin](https://github.com/ngoduykhanh/PowerDNS-Admin). Exposes port 8080 for proxy connections, and expects a uWSGI backend image under `pdns-admin-uwsgi` alias.
+Front-end image with nginx and static files for [PowerDNS Admin](https://github.com/ngoduykhanh/PowerDNS-Admin). Exposes port 80 for proxy connections, and expects a uWSGI backend image under `pdns-admin-uwsgi` alias.
 
 ### pdns-admin-nginx Example
 

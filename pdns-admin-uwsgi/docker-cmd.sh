@@ -3,7 +3,7 @@
 set -euo pipefail
 
 # Download code
-curl -sSL https://github.com/thomasDOTde/PowerDNS-Admin/archive/master.tar.gz | tar -xzC /opt/powerdns-admin --strip 1
+curl -sSL https://github.com/ngoduykhanh/PowerDNS-Admin/archive/master.tar.gz | tar -xzC /opt/powerdns-admin --strip 1
 
 # Install python stuff
 sed -i '/python-ldap/d' /opt/powerdns-admin/requirements.txt

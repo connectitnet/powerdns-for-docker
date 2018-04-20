@@ -6,7 +6,7 @@ Image **pdns** contains completely configurable [PowerDNS 4.1.x server](https://
 
 Image **pdns-recursor** contains completely configurable [PowerDNS 4.1.x recursor](https://www.powerdns.com/).
 
-Images **pdns-admin-nginx** and **pdns-admin-uwsgi** contains frontend (nginx) and backend (uWSGI) for [PowerDNS Admin](https://github.com/thomasDOTde/PowerDNS-Admin) web app, written in Flask, for managing PowerDNS servers. [PowerDNS Admin](https://github.com/thomasDOTde/PowerDNS-Admin) is also completely configurable.
+Images **pdns-admin-nginx** and **pdns-admin-uwsgi** contains frontend (nginx) and backend (uWSGI) for [PowerDNS Admin](https://github.com/ngoduykhanh/PowerDNS-Admin) web app, written in Flask, for managing PowerDNS servers. [PowerDNS Admin](https://github.com/ngoduykhanh/PowerDNS-Admin) is also completely configurable.
 
 ***
 
@@ -89,7 +89,7 @@ docker run -d -p 53:53 -p 53:53/udp --name pdns-recursor connectitnet/pdns-recur
 
 ## pdns-admin-uwsgi
 
-Docker image with the backend of [PowerDNS Admin](https://github.com/thomasDOTde/PowerDNS-Admin) web app, written in Flask, for managing PowerDNS servers. This image contains the python part of the app running under uWSGI. It needs external sql server.
+Docker image with the backend of [PowerDNS Admin](https://github.com/ngoduykhanh/PowerDNS-Admin) web app, written in Flask, for managing PowerDNS servers. This image contains the python part of the app running under uWSGI. It needs external sql server.
 
 Env vars for sql configuration:
 
@@ -156,7 +156,7 @@ docker run -d --name pdns-admin-uwsgi \
 
 ## pdns-admin-nginx
 
-Front-end image with nginx and static files for [PowerDNS Admin](https://github.com/thomasDOTde/PowerDNS-Admin). Exposes port 8080 for proxy connections, and expects a uWSGI backend image under `pdns-admin-uwsgi` alias.
+Front-end image with nginx and static files for [PowerDNS Admin](https://github.com/ngoduykhanh/PowerDNS-Admin). Exposes port 8080 for proxy connections, and expects a uWSGI backend image under `pdns-admin-uwsgi` alias.
 
 ### pdns-admin-nginx Example
 

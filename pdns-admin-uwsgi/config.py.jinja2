@@ -2,7 +2,7 @@ import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 {% for key, value in environment('PDNS_ADMIN_') %}
-{{ key }} = {% if key not in ('TIMEOUT','SIGNUP_ENABLED','BASIC_ENABLED','RECORDS_ALLOW_EDIT') %}"{{ value }}"{% else %}{{value}}{% endif %}{% endfor %}
+{{ key }} = {% if key not in ('TIMEOUT','SIGNUP_ENABLED','BASIC_ENABLED','RECORDS_ALLOW_EDIT','FORWARD_RECORDS_ALLOW_EDIT','REVERSE_RECORDS_ALLOW_EDIT') %}"{{ value }}"{% else %}{{value}}{% endif %}{% endfor %}
 
 WTF_CSRF_ENABLED = True
 

@@ -11,7 +11,11 @@ case ${BACKEND} in
     if [ "${PDNS_gmysql_user}" = 'root' ]; then
         : "${PDNS_gmysql_password:=$MYSQL_ENV_MYSQL_ROOT_PASSWORD}"
     fi
-    : "${PDNS_gmysql_password:=${MYSQL_ENV_MYSQL_PASSWORD:-powerdns}}"
+    if [ -f /run/secrets/mysql_pdns_password ]; then
+        PDNS_gmysql_password=$(cat /run/secrets/mysql_pdns_password)
+    else
+        : "${PDNS_gmysql_password:=${MYSQL_ENV_MYSQL_PASSWORD:-powerdns}}"
+    fi
     : "${PDNS_gmysql_dbname:=${MYSQL_ENV_MYSQL_DATABASE:-powerdns}}"
     PDNS_launch=gmysql
 
@@ -70,7 +74,7 @@ case ${BACKEND} in
     # Create database
     CREATE_DB_SQL="create database $PDNS_gpgsql_dbname"
     # Check if database has tables
-    HAS_TABLE_SQL=" SELECT COUNT(DISTINCT tablename) from pg_catalog.pg_tables WHERE schemaname='public';"
+    HAS_TABLE_SQL="SELECT COUNT(DISTINCT tablename) from pg_catalog.pg_tables WHERE schemaname='public';"
 
     CHECK_DB_CMD="$PSQL_COMMAND -t -c \"$CHECK_DB_SQL\""
     DB_EXISTS=$(eval $CHECK_DB_CMD)

@@ -10,7 +10,7 @@ chown -R root: /opt/powerdns-admin
 chown -R www-data: /opt/powerdns-admin/upload
 pip install -r requirements.txt
 
-# Generate secret key
+# Generate secret key if not present
 [ -f /root/secret-key ] || tr -dc _A-Z-a-z-0-9 < /dev/urandom | head -c 32 > /root/secret-key || true
 PDNS_ADMIN_SECRET_KEY=$(cat /root/secret-key)
 
@@ -18,7 +18,11 @@ export PDNS_ADMIN_SECRET_KEY
 
 # Configure pdns server env vars
 : "${PDNS_ADMIN_PDNS_STATS_URL:=http://pdns:${PDNS_ENV_PDNS_webserver_port:-8081}/}"
-: "${PDNS_ADMIN_PDNS_API_KEY:=${PDNS_ENV_PDNS_api_key:-}}"
+if [ -f /run/secrets/pdns_api_key ]; then
+    PDNS_ADMIN_PDNS_API_KEY=$(cat /run/secrets/pdns_api_key)
+else
+    : "${PDNS_ADMIN_PDNS_API_KEY:=${PDNS_ENV_PDNS_api_key:-}}"
+fi
 : "${PDNS_ADMIN_PDNS_VERSION:=${PDNS_ENV_VERSION:-}}"
 
 export PDNS_ADMIN_PDNS_STATS_URL PDNS_ADMIN_PDNS_API_KEY PDNS_ADMIN_PDNS_VERSION
@@ -34,7 +38,11 @@ case ${DBBACKEND} in
     if [ "${PDNS_ADMIN_SQLA_DB_USER}" = "'root'" ]; then
         : "${PDNS_ADMIN_SQLA_DB_PASSWORD:=$MYSQL_ENV_MYSQL_ROOT_PASSWORD}"
     fi
-    : "${PDNS_ADMIN_SQLA_DB_PASSWORD:=${MYSQL_ENV_MYSQL_PASSWORD:-powerdnsadmin}}"
+    if [ -f /run/secrets/mysql_pdnsadmin_password ]; then
+        PDNS_ADMIN_SQLA_DB_PASSWORD=$(cat /run/secrets/mysql_pdnsadmin_password)
+    else
+        : "${PDNS_ADMIN_SQLA_DB_PASSWORD:=${MYSQL_ENV_MYSQL_PASSWORD:-powerdnsadmin}}"
+    fi
     : "${PDNS_ADMIN_SQLA_DB_NAME:=${MYSQL_ENV_MYSQL_DATABASE:-powerdnsadmin}}"
 
     export PDNS_ADMIN_SQLA_DB_BACKEND PDNS_ADMIN_SQLA_DB_HOST PDNS_ADMIN_SQLA_DB_PORT PDNS_ADMIN_SQLA_DB_USER PDNS_ADMIN_SQLA_DB_PASSWORD PDNS_ADMIN_SQLA_DB_NAME    

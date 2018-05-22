@@ -27,10 +27,14 @@ fi
 
 export PDNS_ADMIN_PDNS_STATS_URL PDNS_ADMIN_PDNS_API_KEY PDNS_ADMIN_PDNS_VERSION
 
-
 case ${DBBACKEND} in
 'mysql')
     # Configure mysql env vars
+
+    if [ -f /run/secrets/mysql_root_password ]; then
+        MYSQL_ROOT_PASSWORD=$(cat /run/secrets/mysql_root_password)
+    fi
+
     : "${PDNS_ADMIN_SQLA_DB_BACKEND:=mysql}"
     : "${PDNS_ADMIN_SQLA_DB_HOST:=mysql}"
     : "${PDNS_ADMIN_SQLA_DB_PORT:=3306}"
@@ -52,12 +56,26 @@ case ${DBBACKEND} in
     # Initialize DB if needed
     MYSQL_COMMAND="mysql -h ${PDNS_ADMIN_SQLA_DB_HOST//\'/} -P ${PDNS_ADMIN_SQLA_DB_PORT//\'/} -u ${PDNS_ADMIN_SQLA_DB_USER//\'/} -p${PDNS_ADMIN_SQLA_DB_PASSWORD//\'/}"
 
-    until $MYSQL_COMMAND -e ';' ; do
-        >&2 echo 'MySQL is unavailable - sleeping'
-        sleep 1
-    done
+    function wait_for_mysql () {
+        until $1 -e ';' ; do
+            >&2 echo 'MySQL is unavailable - sleeping'
+            sleep 1
+        done
+    }
 
-    $MYSQL_COMMAND -e "CREATE DATABASE IF NOT EXISTS ${PDNS_ADMIN_SQLA_DB_NAME//\'/}"
+    if [[ $CREATEUSER = "True" ]]; then
+        MYSQL_ROOT_COMMAND="mysql -h ${PDNS_ADMIN_SQLA_DB_HOST//\'/} -P ${PDNS_ADMIN_SQLA_DB_PORT//\'/} -u root -p${MYSQL_ROOT_PASSWORD//\'/}"
+        wait_for_mysql $MYSQL_ROOT_COMMAND
+        $MYSQL_ROOT_COMMAND -e "CREATE DATABASE IF NOT EXISTS ${PDNS_ADMIN_SQLA_DB_NAME//\'/}"
+        $MYSQL_ROOT_COMMAND -e "CREATE USER ${PDNS_ADMIN_SQLA_DB_USER//\'/}"
+        $MYSQL_ROOT_COMMAND -e "GRANT ALL PRIVILEGES ON ${PDNS_ADMIN_SQLA_DB_NAME//\'/}.* TO ${PDNS_ADMIN_SQLA_DB_USER//\'/}@'%' IDENTIFIED BY '${PDNS_ADMIN_SQLA_DB_PASSWORD//\'/}';"
+        $MYSQL_ROOT_COMMAND -e "FLUSH PRIVILEGES;"
+    else
+        wait_for_mysql $MYSQL_COMMAND
+        $MYSQL_COMMAND -e "CREATE DATABASE IF NOT EXISTS ${PDNS_ADMIN_SQLA_DB_NAME//\'/}"
+    fi
+
+    wait_for_mysql $MYSQL_COMMAND
 
     MYSQL_CHECK_IF_HAS_TABLE="SELECT COUNT(DISTINCT table_name) FROM information_schema.columns WHERE table_schema = '${PDNS_ADMIN_SQLA_DB_NAME//\'/}';"
     MYSQL_NUM_TABLE=$($MYSQL_COMMAND --batch --skip-column-names -e "$MYSQL_CHECK_IF_HAS_TABLE")

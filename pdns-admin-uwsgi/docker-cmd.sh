@@ -42,7 +42,7 @@ case ${DBBACKEND} in
     if [ "${PDNS_ADMIN_SQLA_DB_USER}" = "'root'" ]; then
         : "${PDNS_ADMIN_SQLA_DB_PASSWORD:=$MYSQL_ENV_MYSQL_ROOT_PASSWORD}"
     fi
-    if [ -f /run/secrets/mysql_pdnsadmin_password ]; then
+    if [ -f /run/secrets/mysql__password ]; then
         PDNS_ADMIN_SQLA_DB_PASSWORD=$(cat /run/secrets/mysql_pdnsadmin_password)
     else
         : "${PDNS_ADMIN_SQLA_DB_PASSWORD:=${MYSQL_ENV_MYSQL_PASSWORD:-powerdnsadmin}}"
@@ -63,11 +63,11 @@ case ${DBBACKEND} in
         done
     }
 
-    if [[ $CREATEUSER = "True" ]]; then
+    if [ ! -z "$CREATEUSER" ]; then
         MYSQL_ROOT_COMMAND="mysql -h ${PDNS_ADMIN_SQLA_DB_HOST//\'/} -P ${PDNS_ADMIN_SQLA_DB_PORT//\'/} -u root -p${MYSQL_ROOT_PASSWORD//\'/}"
-        wait_for_mysql $MYSQL_ROOT_COMMAND
-        $MYSQL_ROOT_COMMAND -e "CREATE DATABASE IF NOT EXISTS ${PDNS_ADMIN_SQLA_DB_NAME//\'/}"
-        $MYSQL_ROOT_COMMAND -e "CREATE USER ${PDNS_ADMIN_SQLA_DB_USER//\'/}"
+        wait_for_mysql "$MYSQL_ROOT_COMMAND"
+        $MYSQL_ROOT_COMMAND -e "CREATE DATABASE IF NOT EXISTS ${PDNS_ADMIN_SQLA_DB_NAME//\'/};"
+        $MYSQL_ROOT_COMMAND -e "CREATE USER ${PDNS_ADMIN_SQLA_DB_USER//\'/};"
         $MYSQL_ROOT_COMMAND -e "GRANT ALL PRIVILEGES ON ${PDNS_ADMIN_SQLA_DB_NAME//\'/}.* TO ${PDNS_ADMIN_SQLA_DB_USER//\'/}@'%' IDENTIFIED BY '${PDNS_ADMIN_SQLA_DB_PASSWORD//\'/}';"
         $MYSQL_ROOT_COMMAND -e "FLUSH PRIVILEGES;"
     else

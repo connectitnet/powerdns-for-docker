@@ -62,8 +62,9 @@ case ${DBBACKEND} in
             sleep 1
         done
     }
-
-    if [ ! -z "$CREATEUSER" ]; then
+    
+    FALSE="False"
+    if [ ! -z ${CREATEUSER+FALSE} ] && [ $CREATEUSER = "True" ]; then
         MYSQL_ROOT_COMMAND="mysql -h ${PDNS_ADMIN_SQLA_DB_HOST//\'/} -P ${PDNS_ADMIN_SQLA_DB_PORT//\'/} -u root -p${MYSQL_ROOT_PASSWORD//\'/}"
         wait_for_mysql "$MYSQL_ROOT_COMMAND"
         $MYSQL_ROOT_COMMAND -e "CREATE DATABASE IF NOT EXISTS ${PDNS_ADMIN_SQLA_DB_NAME//\'/};"

@@ -42,7 +42,7 @@ case ${DBBACKEND} in
     if [ "${PDNS_ADMIN_SQLA_DB_USER}" = "'root'" ]; then
         : "${PDNS_ADMIN_SQLA_DB_PASSWORD:=$MYSQL_ENV_MYSQL_ROOT_PASSWORD}"
     fi
-    if [ -f /run/secrets/mysql__password ]; then
+    if [ -f /run/secrets/mysql_pdnsadmin_password ]; then
         PDNS_ADMIN_SQLA_DB_PASSWORD=$(cat /run/secrets/mysql_pdnsadmin_password)
     else
         : "${PDNS_ADMIN_SQLA_DB_PASSWORD:=${MYSQL_ENV_MYSQL_PASSWORD:-powerdnsadmin}}"
@@ -62,7 +62,7 @@ case ${DBBACKEND} in
             sleep 1
         done
     }
-    
+
     FALSE="False"
     if [ ! -z ${CREATEUSER+FALSE} ] && [ $CREATEUSER = "True" ]; then
         MYSQL_ROOT_COMMAND="mysql -h ${PDNS_ADMIN_SQLA_DB_HOST//\'/} -P ${PDNS_ADMIN_SQLA_DB_PORT//\'/} -u root -p${MYSQL_ROOT_PASSWORD//\'/}"
@@ -72,11 +72,11 @@ case ${DBBACKEND} in
         $MYSQL_ROOT_COMMAND -e "GRANT ALL PRIVILEGES ON ${PDNS_ADMIN_SQLA_DB_NAME//\'/}.* TO ${PDNS_ADMIN_SQLA_DB_USER//\'/}@'%' IDENTIFIED BY '${PDNS_ADMIN_SQLA_DB_PASSWORD//\'/}';"
         $MYSQL_ROOT_COMMAND -e "FLUSH PRIVILEGES;"
     else
-        wait_for_mysql $MYSQL_COMMAND
+        wait_for_mysql "$MYSQL_COMMAND"
         $MYSQL_COMMAND -e "CREATE DATABASE IF NOT EXISTS ${PDNS_ADMIN_SQLA_DB_NAME//\'/}"
     fi
 
-    wait_for_mysql $MYSQL_COMMAND
+    wait_for_mysql "$MYSQL_COMMAND"
 
     MYSQL_CHECK_IF_HAS_TABLE="SELECT COUNT(DISTINCT table_name) FROM information_schema.columns WHERE table_schema = '${PDNS_ADMIN_SQLA_DB_NAME//\'/}';"
     MYSQL_NUM_TABLE=$($MYSQL_COMMAND --batch --skip-column-names -e "$MYSQL_CHECK_IF_HAS_TABLE")

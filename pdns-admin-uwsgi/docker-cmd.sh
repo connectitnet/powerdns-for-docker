@@ -57,6 +57,7 @@ case ${DBBACKEND} in
     MYSQL_COMMAND="mysql -h ${PDNS_ADMIN_SQLA_DB_HOST//\'/} -P ${PDNS_ADMIN_SQLA_DB_PORT//\'/} -u ${PDNS_ADMIN_SQLA_DB_USER//\'/} -p${PDNS_ADMIN_SQLA_DB_PASSWORD//\'/}"
 
     function wait_for_mysql () {
+        echo "Trying to execute> $1 -e ';'"
         until $1 -e ';' ; do
             >&2 echo 'MySQL is unavailable - sleeping'
             sleep 1
@@ -65,6 +66,7 @@ case ${DBBACKEND} in
 
     FALSE="False"
     if [ ! -z ${CREATEUSER+FALSE} ] && [ $CREATEUSER = "True" ]; then
+        echo "Creating user ${PDNS_ADMIN_SQLA_DB_USER//\'/} for DB ${PDNS_ADMIN_SQLA_DB_NAME//\'/}"
         MYSQL_ROOT_COMMAND="mysql -h ${PDNS_ADMIN_SQLA_DB_HOST//\'/} -P ${PDNS_ADMIN_SQLA_DB_PORT//\'/} -u root -p${MYSQL_ROOT_PASSWORD//\'/}"
         wait_for_mysql "$MYSQL_ROOT_COMMAND"
         $MYSQL_ROOT_COMMAND -e "CREATE DATABASE IF NOT EXISTS ${PDNS_ADMIN_SQLA_DB_NAME//\'/};"

@@ -1,0 +1,18 @@
+import os
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+{% for key, value in environment('PDNS_ADMIN_') %}
+{{ key }} = {% if key not in ('TIMEOUT','SIGNUP_ENABLED','BASIC_ENABLED','RECORDS_ALLOW_EDIT','FORWARD_RECORDS_ALLOW_EDIT','REVERSE_RECORDS_ALLOW_EDIT') %}"{{ value }}"{% else %}{{value}}{% endif %}{% endfor %}
+
+WTF_CSRF_ENABLED = True
+
+# SAML Authentication
+SAML_ENABLED = os.getenv('PDNS_ADMIN_SAML_ENABLED',False)
+
+BIND_ADDRESS = '0.0.0.0'
+PORT = 8181
+LOG_FILE = ''
+UPLOAD_DIR = '/opt/powerdns-admin/upload'
+SQLALCHEMY_DATABASE_URI = SQLA_DB_BACKEND + '://' + SQLA_DB_USER + ':' + SQLA_DB_PASSWORD + '@' + SQLA_DB_HOST + ':' + SQLA_DB_PORT + '/' + SQLA_DB_NAME
+SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
+SQLALCHEMY_TRACK_MODIFICATIONS = True

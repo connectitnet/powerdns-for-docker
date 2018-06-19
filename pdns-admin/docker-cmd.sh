@@ -137,6 +137,7 @@ case ${DBBACKEND} in
     ;;
 esac
 
+/usr/local/bin/flask db init --directory /opt/powerdns-admin/migrations
 /usr/local/bin/flask db migrate -m "Upgrade BD Schema" --directory /powerdns-admin/migrations
 /usr/local/bin/flask db upgrade --directory /powerdns-admin/migrations
 

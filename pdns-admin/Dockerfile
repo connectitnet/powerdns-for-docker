@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   apt-transport-https \
   && curl https://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | apt-key add - \
   && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
-  && mv /etc/apt/sources.list.d.disabled /etc/apt/sources.list.d \
+  && ln /etc/apt/sources.list.d.available/* /etc/apt/sources.list.d/ \
   && apt-get update && apt-get install -y --no-install-recommends \
   postgresql-client \
   mysql-client \

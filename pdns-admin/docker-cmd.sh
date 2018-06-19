@@ -134,10 +134,8 @@ case ${DBBACKEND} in
     ;;
 esac
 
-if [ -d "/opt/powerdns-admin/migrations" ]; then
-    /usr/local/bin/flask db migrate -m "Upgrade BD Schema" --directory /powerdns-admin/migrations
-    /usr/local/bin/flask db upgrade --directory /powerdns-admin/migrations
-fi
+/usr/local/bin/flask db migrate -m "Upgrade BD Schema" --directory /powerdns-admin/migrations
+/usr/local/bin/flask db upgrade --directory /powerdns-admin/migrations
 
 yarn install --pure-lockfile
 flask assets build

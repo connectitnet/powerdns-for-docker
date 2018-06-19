@@ -52,7 +52,9 @@ case ${DBBACKEND} in
     MYSQL_COMMAND="mysql -h ${PDNS_ADMIN_SQLA_DB_HOST//\'/} -P ${PDNS_ADMIN_SQLA_DB_PORT//\'/} -u ${PDNS_ADMIN_SQLA_DB_USER//\'/} -p${PDNS_ADMIN_SQLA_DB_PASSWORD//\'/}"
 
     function wait_for_mysql () {
-        echo "Trying to execute> $1 -e ';'"
+        if [ ! -z ${DEBUG+0} ] && [ $DEBUG = 1 ]; then
+            echo "Trying to execute> $1 -e ';'"
+        fi
         until $1 -e ';' ; do
             >&2 echo 'MySQL is unavailable - sleeping'
             sleep 1

@@ -138,10 +138,10 @@ case ${DBBACKEND} in
 esac
 
 /usr/local/bin/flask db init --directory /opt/powerdns-admin/migrations
-/usr/local/bin/flask db migrate -m "Upgrade BD Schema" --directory /powerdns-admin/migrations
-/usr/local/bin/flask db upgrade --directory /powerdns-admin/migrations
+/usr/local/bin/flask db migrate -m "Upgrade BD Schema" --directory /opt/powerdns-admin/migrations
+/usr/local/bin/flask db upgrade --directory /opt/powerdns-admin/migrations
 
 yarn install --pure-lockfile
-flask assets build
+/usr/local/bin/flask assets build
 
 exec /usr/bin/supervisord -c /etc/supervisord.conf

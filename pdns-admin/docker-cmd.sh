@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+cd /opt/powerdns-admin
+
 # Generate secret key if not present
 [ -f /root/secret-key ] || tr -dc _A-Z-a-z-0-9 < /dev/urandom | head -c 32 > /root/secret-key || true
 PDNS_ADMIN_SECRET_KEY=$(cat /root/secret-key)
@@ -75,7 +77,10 @@ case ${DBBACKEND} in
     MYSQL_CHECK_IF_HAS_TABLE="SELECT COUNT(DISTINCT table_name) FROM information_schema.columns WHERE table_schema = '${PDNS_ADMIN_SQLA_DB_NAME//\'/}';"
     MYSQL_NUM_TABLE=$($MYSQL_COMMAND --batch --skip-column-names -e "$MYSQL_CHECK_IF_HAS_TABLE")
     if [ "$MYSQL_NUM_TABLE" -eq 0 ]; then
-        python3 /opt/powerdns-admin/create_db.py
+        flask db init --directory /opt/powerdns-admin/migrations
+        flask db migrate -m "Init DB" --directory /opt/powerdns-admin/migrations
+        flask db upgrade --directory /opt/powerdns-admin/migrations
+        python3 /opt/powerdns-admin/init_data.py
     fi
     ;;
 'postgresql')
@@ -121,17 +126,16 @@ case ${DBBACKEND} in
 
     if [ "$NUM_TABLES_EXIST" -eq 0 ]; then
         echo "Database $PDNS_ADMIN_SQLA_DB_NAME is empty, creating db..."
-        python3 /opt/powerdns-admin/create_db.py
+        flask db init --directory /opt/powerdns-admin/migrations
+        flask db migrate -m "Init DB" --directory /opt/powerdns-admin/migrations
+        flask db upgrade --directory /opt/powerdns-admin/migrations
+        python3 /opt/powerdns-admin/init_data.py
+else
     fi
     ;;
 esac
 
-if [ ! -d "/opt/powerdns-admin/migrations" ]; then
-    flask db init --directory /opt/powerdns-admin/migrations
-    flask db migrate -m "Init DB" --directory /opt/powerdns-admin/migrations
-    flask db upgrade --directory /opt/powerdns-admin/migrations
-    ./init_data.py
-else
+if [ -d "/opt/powerdns-admin/migrations" ]; then
     /usr/local/bin/flask db migrate -m "Upgrade BD Schema" --directory /powerdns-admin/migrations
     /usr/local/bin/flask db upgrade --directory /powerdns-admin/migrations
 fi

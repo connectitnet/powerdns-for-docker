@@ -3,6 +3,7 @@
 set -euo pipefail
 
 cd /opt/powerdns-admin
+export FLASK_APP=app/__init__.py
 
 # Generate secret key if not present
 [ -f /root/secret-key ] || tr -dc _A-Z-a-z-0-9 < /dev/urandom | head -c 32 > /root/secret-key || true

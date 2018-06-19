@@ -130,7 +130,6 @@ case ${DBBACKEND} in
         flask db migrate -m "Init DB" --directory /opt/powerdns-admin/migrations
         flask db upgrade --directory /opt/powerdns-admin/migrations
         python3 /opt/powerdns-admin/init_data.py
-else
     fi
     ;;
 esac

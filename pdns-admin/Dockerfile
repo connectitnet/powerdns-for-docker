@@ -30,7 +30,7 @@ RUN curl -sSL https://github.com/ngoduykhanh/PowerDNS-Admin/archive/master.tar.g
   && chown -R root: /opt/powerdns-admin \
   && chown -R www-data: /opt/powerdns-admin/upload \
   && pip install -r requirements.txt \
-  && pip install envtpl uwsgi ldap psycopg2
+  && pip install envtpl uwsgi psycopg2
 
 ENV PDNS_ADMIN_LOGIN_TITLE="PDNS" \
   PDNS_ADMIN_TIMEOUT=10 \

@@ -78,13 +78,8 @@ case ${DBBACKEND} in
     wait_for_mysql "$MYSQL_COMMAND"
 
     MYSQL_CHECK_IF_HAS_TABLE="SELECT COUNT(DISTINCT table_name) FROM information_schema.columns WHERE table_schema = '${PDNS_ADMIN_SQLA_DB_NAME//\'/}';"
-    MYSQL_NUM_TABLE=$($MYSQL_COMMAND --batch --skip-column-names -e "$MYSQL_CHECK_IF_HAS_TABLE")
-    if [ "$MYSQL_NUM_TABLE" -eq 0 ]; then
-        flask db init --directory /opt/powerdns-admin/migrations
-        flask db migrate -m "Init DB" --directory /opt/powerdns-admin/migrations
-        flask db upgrade --directory /opt/powerdns-admin/migrations
-        python3 /opt/powerdns-admin/init_data.py
-    fi
+    NUM_TABLES_EXIST=$($MYSQL_COMMAND --batch --skip-column-names -e "$MYSQL_CHECK_IF_HAS_TABLE")
+    
     ;;
 'postgresql')
     # Configure postgresql env vars
@@ -127,23 +122,22 @@ case ${DBBACKEND} in
     CHECK_TABLES_CMD="$PSQL_COMMAND $PDNS_ADMIN_SQLA_DB_NAME -t -c \"$HAS_TABLE_SQL\""
     NUM_TABLES_EXIST=$(eval $CHECK_TABLES_CMD)
 
-    if [ "$NUM_TABLES_EXIST" -eq 0 ]; then
-        echo "Database $PDNS_ADMIN_SQLA_DB_NAME is empty, creating db..."
-        flask db init --directory /opt/powerdns-admin/migrations
-        flask db migrate -m "Init DB" --directory /opt/powerdns-admin/migrations
-        flask db upgrade --directory /opt/powerdns-admin/migrations
-        python3 /opt/powerdns-admin/init_data.py
-    fi
     ;;
 esac
 
-if [ ! -d "/powerdns-admin/migrations" ]; then
-    /usr/local/bin/flask db init --directory /opt/powerdns-admin/migrations
+if [ ! "$(ls -A /opt/powerdns-admin/migrations)" ]; then
+    flask db init --directory /tmp/powerdns-admin/migrations
+    mv /tmp/powerdns-admin/migrations/* /opt/powerdns-admin/migrations
 fi
-/usr/local/bin/flask db migrate -m "Upgrade BD Schema" --directory /opt/powerdns-admin/migrations
-/usr/local/bin/flask db upgrade --directory /opt/powerdns-admin/migrations
+if [ "$NUM_TABLES_EXIST" -eq 0 ]; then
+    flask db migrate -m "Init DB" --directory /opt/powerdns-admin/migrations
+    flask db upgrade --directory /opt/powerdns-admin/migrations
+    python3 /opt/powerdns-admin/init_data.py
+else
+    flask db migrate -m "Update DB" --directory /opt/powerdns-admin/migrations
+    flask db upgrade --directory /opt/powerdns-admin/migrations
+fi
 
-yarn install --pure-lockfile
-/usr/local/bin/flask assets build
+flask assets build
 
 exec /usr/bin/supervisord -c /etc/supervisord.conf

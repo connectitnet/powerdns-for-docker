@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   apt-transport-https \
   && curl -sSL https://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | apt-key add - \
   && curl -sSL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+  && curl -sSL https://deb.nodesource.com/setup_9.x | bash - \
   && ln /etc/apt/sources.list.d.available/* /etc/apt/sources.list.d/ \
   && apt-get update && apt-get install -y --no-install-recommends \
   postgresql-client \
@@ -19,7 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   libsasl2-dev libldap2-dev libssl-dev \
   libxml2-dev libxslt1-dev libxmlsec1-dev libffi-dev pkg-config \
   locales locales-all \
-  yarn nginx \
+  nodejs yarn nginx \
   && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /opt/powerdns-admin \
   && apt-get purge -y --auto-remove gnupg
@@ -31,6 +32,8 @@ RUN curl -sSL https://github.com/ngoduykhanh/PowerDNS-Admin/archive/master.tar.g
   && chown -R www-data: /opt/powerdns-admin/upload \
   && pip install -r requirements.txt \
   && pip install envtpl uwsgi psycopg2
+
+RUN yarn install --pure-lockfile
 
 ENV PDNS_ADMIN_LOGIN_TITLE="PDNS" \
   PDNS_ADMIN_TIMEOUT=10 \
@@ -48,7 +51,7 @@ ENV LANGUAGE en_US.UTF-8
 EXPOSE 8181
 
 VOLUME [ "/opt/powerdns-admin/upload" ]
-
+VOLUME [ "/opt/powerdns-admin/migrations" ]
 
 COPY uwsgi.ini /etc/uwsgi/
 COPY supervisord.conf /etc/supervisord.conf

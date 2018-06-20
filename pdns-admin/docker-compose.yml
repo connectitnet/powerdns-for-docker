@@ -50,6 +50,7 @@ services:
   pdns-server:
     image: psitrax/powerdns
     hostname: pdns
+    container_name: pdns
     ports:
       - "53:53"
     networks:
@@ -67,6 +68,7 @@ services:
 
   pdns-mysql:
     image: mysql/mysql-server:5.7
+    container_name: pdns-mysql
     mem_limit: 256M
     memswap_limit: 256M
     ports:

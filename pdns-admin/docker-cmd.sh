@@ -139,5 +139,6 @@ else
 fi
 
 flask assets build
+chown www-data:www-data -R /opt/powerdns-admin/app/static
 
 exec /usr/bin/supervisord -c /etc/supervisord.conf

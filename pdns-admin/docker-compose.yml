@@ -20,7 +20,7 @@ services:
       DBBACKEND: mysql
       PDNS_ADMIN_PDNS_VERSION: '4.1.1'
       PDNS_ADMIN_PDNS_API_KEY: someapikey
-      PDNS_ADMIN_SIGNUP_ENABLED: "False"
+      PDNS_ADMIN_SIGNUP_ENABLED: "True"
       PDNS_ADMIN_SQLA_DB_USER: pdnsadmin
       PDNS_ADMIN_SQLA_DB_NAME: pdnsadmin
       PDNS_ADMIN_SQLA_DB_PASSWORD: somepassword

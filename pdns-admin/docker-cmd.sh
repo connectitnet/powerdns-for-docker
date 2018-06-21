@@ -134,6 +134,7 @@ if [ "$NUM_TABLES_EXIST" -eq 0 ]; then
     flask db upgrade --directory /opt/powerdns-admin/migrations
     python3 /opt/powerdns-admin/init_data.py
 else
+    flask db upgrade --directory /opt/powerdns-admin/migrations
     flask db migrate -m "Update DB" --directory /opt/powerdns-admin/migrations
     flask db upgrade --directory /opt/powerdns-admin/migrations
 fi

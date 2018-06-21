@@ -141,5 +141,7 @@ fi
 
 flask assets build
 chown www-data:www-data -R /opt/powerdns-admin/app/static
+mkdir /opt/powerdns-admin/upload/avatar
+chown www-data:www-data -R /opt/powerdns-admin/upload
 
 exec /usr/bin/supervisord -c /etc/supervisord.conf

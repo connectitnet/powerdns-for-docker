@@ -32,4 +32,6 @@ EXPOSE 53 53/udp 8082
 COPY recursor.conf.jinja2 /etc/powerdns/
 COPY docker-cmd.sh /
 
+HEALTHCHECK --interval=10s --retries=3 CMD /usr/bin/rec_control ping
+
 CMD [ "bash", "/docker-cmd.sh" ]

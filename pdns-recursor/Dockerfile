@@ -36,5 +36,5 @@ COPY docker-entrypoint.sh /
 
 HEALTHCHECK --interval=10s --retries=3 CMD /usr/bin/rec_control ping
 
-ENTRYPOINT [ "/docker-entrypoint.sh" ]
+ENTRYPOINT [ "bash", "/docker-entrypoint.sh" ]
 CMD [ "/usr/sbin/pdns_recursor" ]

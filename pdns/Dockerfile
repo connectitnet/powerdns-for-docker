@@ -36,5 +36,5 @@ EXPOSE 53 53/udp 8081
 COPY pdns.conf.jinja2 /etc/powerdns/
 COPY docker-entrypoint.sh /
 
-ENTRYPOINT [ "/docker-entrypoint.sh" ]
+ENTRYPOINT [ "bash", "/docker-entrypoint.sh" ]
 CMD [ "/usr/sbin/pdns_server" ]

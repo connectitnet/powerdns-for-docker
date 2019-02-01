@@ -1,5 +1,7 @@
-FROM python:stretch
-LABEL maintainer="JSenecal@connectitnet.com"
+FROM python:3-stretch
+LABEL maintainer="Jonathan Senecal <JSenecal@jonathansenecal.com>"
+
+ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
   curl \
@@ -7,7 +9,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY src/ /
 
-RUN curl https://repo.powerdns.com/FD380FBB-pub.asc | apt-key add - \
+RUN apt-key adv --no-tty --fetch-keys https://repo.powerdns.com/FD380FBB-pub.asc \
   && apt-get update && apt-get install -y --no-install-recommends \
   pdns-recursor \
   && apt-get purge -y --auto-remove curl gnupg \
@@ -30,8 +32,9 @@ ENV VERSION=4.1 \
 EXPOSE 53 53/udp 8082
 
 COPY recursor.conf.jinja2 /etc/powerdns/
-COPY docker-cmd.sh /
+COPY docker-entrypoint.sh /
 
 HEALTHCHECK --interval=10s --retries=3 CMD /usr/bin/rec_control ping
 
-CMD [ "bash", "/docker-cmd.sh" ]
+ENTRYPOINT [ "/docker-entrypoint.sh" ]
+CMD [ "/usr/sbin/pdns_recursor" ]

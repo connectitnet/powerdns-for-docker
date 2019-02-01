@@ -1,18 +1,18 @@
 # PowerDNS 4.1 Docker Images based on Debian 9 (Stretch)
 
-This repository contains four Docker images - pdns, pdns-recursor, pdns-admin-nginx and pdns-admin-uwsgi.
+This repository contains four Docker images - pdns, pdns-recursor and pdns-admin.
 
-Image **pdns** contains completely configurable [PowerDNS 4.1.x server](https://www.powerdns.com/) with mysql, gpgsql and gsqlite3 backends.
+Image **pdns** contains completely configurable [PowerDNS 4.1.x server](https://www.powerdns.com/) with mysql and gpgsql backends.
 
 Image **pdns-recursor** contains completely configurable [PowerDNS 4.1.x recursor](https://www.powerdns.com/).
 
-Images **pdns-admin-nginx** and **pdns-admin-uwsgi** contains frontend (nginx) and backend (uWSGI) for [PowerDNS Admin](https://github.com/ngoduykhanh/PowerDNS-Admin) web app, written in Flask, for managing PowerDNS servers. [PowerDNS Admin](https://github.com/ngoduykhanh/PowerDNS-Admin) is also completely configurable.
+Images **pdns-admin** contains backend (gunicorn) for [PowerDNS Admin](https://github.com/ngoduykhanh/PowerDNS-Admin) web app, written in Flask, for managing PowerDNS servers. [PowerDNS Admin](https://github.com/ngoduykhanh/PowerDNS-Admin) is also completely configurable.
 
 ***
 
 ## pdns
 
-Docker image with [PowerDNS 4.1.x server](https://www.powerdns.com/) and backends for mysql, gpgsql and gsqlite3.
+Docker image with [PowerDNS 4.1.x server](https://www.powerdns.com/) with mysql and gpgsql backends.
 
 Env vars for gmysql configuration:
 
@@ -87,15 +87,13 @@ Recursor server with API enabled:
 docker run -d -p 53:53 -p 53:53/udp --name pdns-recursor connectitnet/pdns-recursor
 ```
 
-## pdns-admin-uwsgi
+## pdns-admin
 
-Docker image with the backend of [PowerDNS Admin](https://github.com/ngoduykhanh/PowerDNS-Admin) web app, written in Flask, for managing PowerDNS servers. This image contains the python part of the app running under uWSGI. It needs external sql server.
+Docker image with [PowerDNS Admin](https://github.com/ngoduykhanh/PowerDNS-Admin) web app, written in Flask, for managing PowerDNS servers. This image contains the python part of the app running under gunicorn. It needs external *sql server.
 
 Env vars for sql configuration:
 
 ```text
-(name=default value)
-
 PDNS_ADMIN_SQLA_DB_HOST="'sql'"
 PDNS_ADMIN_SQLA_DB_PORT="'3306'"
 PDNS_ADMIN_SQLA_DB_USER="'root'"
@@ -105,8 +103,7 @@ PDNS_ADMIN_SQLA_DB_NAME="'powerdnsadmin'"
 
 If linked with official [mariadb](https://hub.docker.com/_/mariadb/) image with alias `mysql`, the connection can be automatically configured, so you don't need to specify any of the above. Also, DB is automatically initialized if tables are missing.
 
-Similar to the pdns-
-sql, pdns-admin is also completely configurable via env vars. Prefix in this case is `PDNS_ADMIN_`, but there is one caveat: as the config file is a python source file, every string value must be quoted, as shown above. Double quotes are consumed by Bash, so the single quotes stay for Python. (Port number in this case is treated as string, because later on it's concatenated with hostname, user, etc in the db uri). Configuration from these env vars will be written to the `/opt/powerdns-admin/config.py` file.
+Similar to the pdns-sql, pdns-admin is also completely configurable via env vars. Prefix in this case is `PDNS_ADMIN_`, but there is one caveat: as the config file is a python source file, every string value must be quoted, as shown above. Double quotes are consumed by Bash, so the single quotes stay for Python. (Port number in this case is treated as string, because later on it's concatenated with hostname, user, etc in the db uri). Configuration from these env vars will be written to the `/opt/powerdns-admin/config.py` file.
 
 ### Connecting to the PowerDNS server
 
@@ -137,8 +134,7 @@ There is a directory with user uploads which should be persistent: `/opt/powerdn
 
 ### pdns-admin-uwsgi Example
 
-When linked with pdns-
-sql from this repo and with LDAP auth:
+When linked with pdns-sql from this repo and with LDAP auth:
 
 ```text
 docker run -d --name pdns-admin-uwsgi \

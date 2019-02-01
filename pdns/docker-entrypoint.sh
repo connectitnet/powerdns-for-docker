@@ -102,13 +102,10 @@ case ${BACKEND} in
         $PSQL_COMMAND "$PDNS_gpgsql_dbname" -c "$INSERT_SUPERMASTERS_SQL"
     fi
     ;;
-'gsqlite3')
-        #TODO
-    ;;
 esac
 
 
 # Create config file from template
 envtpl < /etc/powerdns/pdns.conf.jinja2 > /etc/powerdns/pdns.conf
 
-exec /usr/sbin/pdns_server
+exec "$@"

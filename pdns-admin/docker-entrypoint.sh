@@ -107,7 +107,7 @@ esac
 
 DB_MIGRATION_DIR='/opt/powerdns-admin/migrations'
 
-echo "---> Running DB Migration"
+echo "===> Running DB Migration"
 set +e
 flask db migrate -m "Upgrade BD Schema" --directory ${DB_MIGRATION_DIR}
 flask db upgrade --directory ${DB_MIGRATION_DIR}
@@ -116,13 +116,14 @@ set -e
 echo "===> Update PDNS API connection info"
 case ${DBBACKEND} in
 'mysql')
-    # initial settings if not available in the DB
+    echo " --> Initial settings if not available in the DB"
     $MYSQL_COMMAND ${PDNS_ADMIN_SQLA_DB_NAME} -e "INSERT INTO setting (name, value) SELECT * FROM (SELECT 'pdns_api_url', '${PDNS_API_URL}') AS tmp WHERE NOT EXISTS (SELECT name FROM setting WHERE name = 'pdns_api_url') LIMIT 1;"
     $MYSQL_COMMAND ${PDNS_ADMIN_SQLA_DB_NAME} -e "INSERT INTO setting (name, value) SELECT * FROM (SELECT 'pdns_api_key', '${PDNS_API_KEY}') AS tmp WHERE NOT EXISTS (SELECT name FROM setting WHERE name = 'pdns_api_key') LIMIT 1;"
 
-    # update pdns api settings if changed from env vars.
-    $MYSQL_COMMAND ${PDNS_ADMIN_SQLA_DB_NAME} -e "UPDATE setting SET value='${PDNS_API_URL}' WHERE name='pdns_api_url';"
-    $MYSQL_COMMAND ${PDNS_ADMIN_SQLA_DB_NAME} -e "UPDATE setting SET value='${PDNS_API_KEY}' WHERE name='pdns_api_key';"
+    
+    echo " --> Update pdns api settings if changed from env vars"
+    $MYSQL_COMMAND ${PDNS_ADMIN_SQLA_DB_NAME} -e "UPDATE setting SET value='${PDNS_API_URL}' WHERE name='pdns_api_url' AND value != '${PDNS_API_URL}';"
+    $MYSQL_COMMAND ${PDNS_ADMIN_SQLA_DB_NAME} -e "UPDATE setting SET value='${PDNS_API_KEY}' WHERE name='pdns_api_key' AND value != '${PDNS_API_KEY}';"
 
 
     FALSE="False"
@@ -141,10 +142,14 @@ case ${DBBACKEND} in
 esac
 
 echo "===> Assets management"
-echo "---> Running Yarn"
+
+echo " --> Restore custom assets"
+tar -xvf staticfiles.tar
+
+echo " --> Running Yarn"
 yarn install --pure-lockfile
 
-echo "---> Running Flask assets"
+echo " --> Running Flask assets"
 flask assets build
 
 exec "$@"

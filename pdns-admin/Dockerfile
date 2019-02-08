@@ -30,11 +30,10 @@ VOLUME [ "/opt/powerdns-admin/app/static", "/opt/powerdns-admin/app/upload" ]
 
 RUN curl -sSL https://github.com/ngoduykhanh/PowerDNS-Admin/archive/master.tar.gz | tar -xzC /opt/powerdns-admin --strip 1 \
   && chown -R root: /opt/powerdns-admin \
-  && chown -R www-data: /opt/powerdns-admin/upload \
-  && pip install --upgrade pip envtpl uwsgi psycopg2 \
-  && pip install -r requirements.txt
-
-RUN yarn install --pure-lockfile
+  && pip install --upgrade pip envtpl psycopg2 \
+  && pip install -r requirements.txt \
+  && tar -cf staticfiles.tar app/static \
+  && rm -rf /opt/powerdns-admin/app/static/*
 
 ENV DBBACKEND='mysql' \
   PDNS_ADMIN_LOGIN_TITLE="PDNS" \

@@ -104,7 +104,7 @@ services:
     build:
       dockerfile: Dockerfile
       context: pdns-admin/
-    image: connectitnet/pdns-admin
+    image: connectitnet/powerdns-admin:latest
     deploy:
       resources:
         limits:

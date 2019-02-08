@@ -57,7 +57,7 @@ COPY supervisord.conf /etc/supervisord.conf
 COPY config.py.jinja2 /
 COPY docker-entrypoint.sh /
 
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5m CMD curl --fail http://localhost:8181 || exit 1
+HEALTHCHECK --interval=30s --timeout=3s --start-period=3m CMD curl --fail http://127.0.0.1:8080 || exit 1
 
 ENTRYPOINT [ "bash", "/docker-entrypoint.sh" ]
 CMD [ "supervisord", "-c", "/etc/supervisord.conf" ]

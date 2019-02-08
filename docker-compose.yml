@@ -1,43 +1,7 @@
 version: "3"
 
 services:
-  powerdns-admin:
-    build:
-      dockerfile: Dockerfile
-      context: pdns-admin/
-    image: connectitnet/pdns-admin
-    deploy:
-      resources:
-        limits:
-          cpus: "0.50"
-          memory: 128M
-        reservations:
-          cpus: "0.25"
-          memory: 128M
-    ports:
-      - "8080:8080"
-    logging:
-      driver: json-file
-      options:
-        max-size: 128M
-    networks:
-      - default
-    volumes:
-      - staticfiles:/opt/powerdns-admin/app/static/
-      - uploads:/opt/powerdns-admin/upload/
-    environment:
-      DBBACKEND: mysql
-      PDNS_ADMIN_PDNS_API_KEY: someapikey
-      PDNS_ADMIN_SIGNUP_ENABLED: "True"
-      PDNS_ADMIN_SQLA_DB_USER: pdnsadmin
-      PDNS_ADMIN_SQLA_DB_NAME: pdnsadmin
-      PDNS_ADMIN_SQLA_DB_PASSWORD: somepassword
-      PDNS_ADMIN_SQLA_DB_HOST: pdnsadmin-db
-    depends_on:
-      - pdnsadmin-db
-      - pdns-server
-
-  pdnsadmin-db:
+  pdns-db:
     image: mysql/mysql-server:5.7
     deploy:
       resources:
@@ -50,32 +14,36 @@ services:
     networks:
       - default
     environment:
-      - MYSQL_DATABASE=pdnsadmin
-      - MYSQL_USER=pdnsadmin
+      - MYSQL_ROOT_PASSWORD=somer00tpassw0rd
+      - MYSQL_DATABASE=powerdns
+      - MYSQL_USER=pdns
       - MYSQL_PASSWORD=somepassword
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 10s
       retries: 5
-
   pdns-server:
     build:
       dockerfile: Dockerfile
       context: pdns/
     image: connectitnet/pdns
-    hostname: pdns
     ports:
       - "5353:53/udp"
     networks:
       - default
     environment:
+      - DEBUG=true
       - BACKEND=gmysql
+      - PDNS_gmysql_user=pdns
+      - PDNS_gmysql_password=somepassword
+      - PDNS_gmysql_host=pdns-db
       - PDNS_master=yes
       - PDNS_api=yes
       - PDNS_api_key=someapikey
       - PDNS_webserver=yes
       - PDNS_webserver_address=0.0.0.0
       - PDNS_webserver_password=somepassword
+      - PDNS_webserver-allow-from=0.0.0.0/0,::/0
       - PDNS_version_string=anonymous
       - PDNS_default_ttl=3600
       - PDNS_soa_minimum_ttl=36000
@@ -109,8 +77,8 @@ services:
     #   - PDNS_default_soa_mail=hostmaster.example.com
     depends_on:
       - pdns-server
-
-  pdns-db:
+  
+  pdnsadmin-db:
     image: mysql/mysql-server:5.7
     deploy:
       resources:
@@ -123,13 +91,49 @@ services:
     networks:
       - default
     environment:
-      - MYSQL_DATABASE=pdns
-      - MYSQL_USER=pdns
+      - MYSQL_ROOT_PASSWORD=somer00tpassw0rd
+      - MYSQL_DATABASE=pdnsadmin
+      - MYSQL_USER=pdnsadmin
       - MYSQL_PASSWORD=somepassword
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 10s
       retries: 5
+  
+  powerdns-admin:
+    build:
+      dockerfile: Dockerfile
+      context: pdns-admin/
+    image: connectitnet/pdns-admin
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 128M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+    logging:
+      driver: json-file
+      options:
+        max-size: 128M
+    networks:
+      - default
+    volumes:
+      - staticfiles:/opt/powerdns-admin/app/static/
+      - uploads:/opt/powerdns-admin/upload/
+    environment:
+      DBBACKEND: mysql
+      PDNS_API_KEY: someapikey
+      PDNS_ADMIN_SIGNUP_ENABLED: "True"
+      PDNS_ADMIN_SQLA_DB_USER: pdnsadmin
+      PDNS_ADMIN_SQLA_DB_NAME: pdnsadmin
+      PDNS_ADMIN_SQLA_DB_PASSWORD: somepassword
+      PDNS_ADMIN_SQLA_DB_HOST: pdnsadmin-db
+      PDNS_HOST: pdns-server
+    depends_on:
+      - pdnsadmin-db
+      - pdns-server
 
   nginx:
     command: nginx -c /etc/nginx/nginx.conf

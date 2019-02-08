@@ -38,7 +38,7 @@ All available settings can be found over [here](https://doc.powerdns.com/md/auth
 
 ```shell
 docker run -d -p 53:53 -p 53:53/udp --name pdns-master \
-  --hostname ns1.example.com --link mariadb:mysql \
+  --hostname ns1.example.com \
   -e BACKEND=gmysql \
   -e PDNS_master=yes \
   -e PDNS_api=yes \
@@ -101,9 +101,7 @@ PDNS_ADMIN_SQLA_DB_PASSWORD="'powerdnsadmin'"
 PDNS_ADMIN_SQLA_DB_NAME="'powerdnsadmin'"
 ```
 
-If linked with official [mariadb](https://hub.docker.com/_/mariadb/) image with alias `mysql`, the connection can be automatically configured, so you don't need to specify any of the above. Also, DB is automatically initialized if tables are missing.
-
-Similar to the pdns-sql, pdns-admin is also completely configurable via env vars. Prefix in this case is `PDNS_ADMIN_`, but there is one caveat: as the config file is a python source file, every string value must be quoted, as shown above. Double quotes are consumed by Bash, so the single quotes stay for Python. (Port number in this case is treated as string, because later on it's concatenated with hostname, user, etc in the db uri). Configuration from these env vars will be written to the `/opt/powerdns-admin/config.py` file.
+Similar to the `pdns` container, pdns-admin is also completely configurable via env vars. Prefix in this case is `PDNS_ADMIN_`, but there is one caveat: as the config file is a python source file, every string value must be quoted, as shown above. Double quotes are consumed by Bash, so the single quotes stay for Python. (Port number in this case is treated as string, because later on it's concatenated with hostname, user, etc in the db uri). Configuration from these env vars will be written to the `/opt/powerdns-admin/config.py` file.
 
 ### Connecting to the PowerDNS server
 
